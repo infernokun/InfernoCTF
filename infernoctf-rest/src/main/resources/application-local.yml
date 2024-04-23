@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: InfernoCTF
+  datasource:
+    url: jdbc:postgresql://0.0.0.0:5432/infernoctf
+    username: main
+    password: assword
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
+      use-new-id-generator-mappings: true
+    show-sql: false
+    open-in-view: true
+server:
+  forward-headers-strategy: native
+  port: 8080
+  servlet:
+    contextPath: /infernoctf-rest
+  shutdown: graceful
+  tomcat:
+    internal-proxies:
+      protocol-header: "X-Forwarded-Proto"
+      remote-ip-header: "X-FORWARDED-FOR"
+  use-forward-headers: true
+  ssl:
+    enabled: true
+    key-store: ${KEYSTORE}
+    key-store-password: ${KEYSTORE_PASSWORD}
+    key-store-type: pkcs12
+    key-alias: mysslkey
+    key-password: ${KEYSTORE_PASSWORD}
+
+infernoctf:
+  applicationName: InfernoCTF
+  chatService: ""
+  chatSocket: ""
+
+ssl:
+  keystore:
+    urI: ${KEYSTORE}
+    password: ${KEYSTORE_PASSWORD}
