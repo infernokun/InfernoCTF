@@ -1,0 +1,16 @@
+<div class="ctf-card-container" *ngIf="!(loading$ | async) else loading">
+    <div *ngFor="let ctf of challenges" class="ctf-card">
+      <h2>{{ ctf.question }}</h2>
+      <p>{{ ctf.points }}</p>
+      <p>Category: {{ ctf.category }}</p>
+      <p>Difficulty: {{ ctf.difficultyLevel }}</p>
+      <button (click)="openViewDialog(ctf)">View Challenge</button>
+      <button (click)="openEditDialog(ctf)">Edit Challenge</button>
+    </div>
+  </div>
+  
+  <ng-template #loading>
+    <div class="spinner-border" role="status">
+      <mat-spinner></mat-spinner>
+    </div>
+  </ng-template>

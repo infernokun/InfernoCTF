@@ -1,0 +1,15 @@
+<div class="view-dialog-container">
+    <h2>{{ viewedChallenge.question }}</h2>
+    <p>{{ viewedChallenge.description }}</p>
+    <p>{{ viewedChallenge.maxAttempts }} attempts</p>
+    <h2>{{ viewedChallenge.points }}</h2>
+
+    <form>
+        <div class="form-group">
+            <input matInput type="text" placeholder="Answer" [(ngModel)]="answer" name="answer" [disabled]="!!(isAnswered$ | async)">
+        </div>
+        
+        <button mat-button type="submit" (click)="checkAnswer(viewedChallenge)" [disabled]="!!(isAnswered$ | async)" [textContent]="!!(isAnswered$ | async) ? 'Complete' : 'Submit'"></button>
+        <button type="button" (click)="closeDialog()">Cancel</button>
+    </form>
+</div>

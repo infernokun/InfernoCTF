@@ -1,0 +1,90 @@
+<div class="edit-dialog-container">
+  <h2>Edit CTF Challenge</h2>
+  <form>
+    <div class="form-group">
+      <label for="question">Question:</label>
+      <input type="text" id="question" name="question" [(ngModel)]="editedChallenge.question">
+    </div>
+    <div class="form-group">
+      <label for="maxAttempts">Max Attempts:</label>
+      <input type="number" id="maxAttempts" name="maxAttempts" [(ngModel)]="editedChallenge.maxAttempts">
+    </div>
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <textarea id="description" name="description" [(ngModel)]="editedChallenge.description"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="hints">Hints:</label>
+      <input type="text" id="hints" name="hints" [(ngModel)]="editedChallenge.hints">
+    </div>
+    <div class="form-group">
+      <label for="category">Category:</label>
+      <input type="text" id="category" name="category" [(ngModel)]="editedChallenge.category">
+    </div>
+    <div class="form-group">
+      <label for="difficultyLevel">Difficulty Level:</label>
+      <input type="text" id="difficultyLevel" name="difficultyLevel" [(ngModel)]="editedChallenge.difficultyLevel">
+    </div>
+    <div class="form-group">
+      <label for="points">Points:</label>
+      <input type="number" id="points" name="points" [(ngModel)]="editedChallenge.points">
+    </div>
+    <div class="form-group">
+      <label for="author">Author:</label>
+      <input type="text" id="author" name="author" [(ngModel)]="editedChallenge.author">
+    </div>
+    <div class="form-group" *ngFor="let flag of editedChallenge.flags">
+      <label for="{{flag.id}}">Flag:</label>
+      <input type="text" class="flag" name="{{flag.id}}" [(ngModel)]="flag.flag">
+
+      <!-- Surround with Tag -->
+      <div class="form-check">
+        <input class="form-check-input" name="surround-{{flag.id}}" type="checkbox" id="surroundWithTag{{flag.id}}"
+          [(ngModel)]="flag.surroundWithTag">
+        <label class="form-check-label" for="surroundWithTag{{flag.id}}">Surround with Tag</label>
+      </div>
+
+      <!-- Case Sensitive -->
+      <div class="form-check">
+        <input class="form-check-input" name="case-{{flag.id}}" type="checkbox" id="caseSensitive{{flag.id}}" [(ngModel)]="flag.caseSensitive">
+        <label class="form-check-label" for="caseSensitive{{flag.id}}">Case Sensitive</label>
+      </div>
+
+      <!-- Weight -->
+      <div class="form-group">
+        <label for="weight{{flag.id}}">Weight:</label>
+        <input type="number" class="form-control" name="weight-{{flag.id}}" id="weight{{flag.id}}" name="weight{{flag.id}}"
+          [(ngModel)]="flag.weight">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="tags">Tags:</label>
+      <input type="text" id="tags" name="tags" [(ngModel)]="editedChallenge.tags">
+    </div>
+    <div class="form-group">
+      <label for="visible">Visible:</label>
+      <input type="checkbox" id="visible" name="visible" [(ngModel)]="editedChallenge.visible">
+    </div>
+    <div class="form-group">
+      <label for="releaseDate">Release Date:</label>
+      <input type="datetime-local" id="releaseDate" name="releaseDate" [(ngModel)]="editedChallenge.releaseDate">
+    </div>
+    <div class="form-group">
+      <label for="expirationDate">Expiration Date:</label>
+      <input type="datetime-local" id="expirationDate" name="expirationDate"
+        [(ngModel)]="editedChallenge.expirationDate">
+    </div>
+    <div class="form-group">
+      <label for="attachments">Attachments:</label>
+      <input type="text" id="attachments" name="attachments" [(ngModel)]="editedChallenge.attachments">
+    </div>
+    <div class="form-group">
+      <label for="solutionExplanation">Solution Explanation:</label>
+      <textarea id="solutionExplanation" name="solutionExplanation"
+        [(ngModel)]="editedChallenge.solutionExplanation"></textarea>
+    </div>
+
+    <button type="submit">Save</button>
+    <button type="button" (click)="closeDialog()">Cancel</button>
+  </form>
+</div>
