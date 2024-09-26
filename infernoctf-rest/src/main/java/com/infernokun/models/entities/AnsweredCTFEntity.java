@@ -26,8 +26,11 @@ public class AnsweredCTFEntity {
     @ManyToOne
     @JoinColumn(name = "ctf_entity_id")
     private CTFEntity ctfEntity;
+    @Builder.Default
     private List<String> answers = new ArrayList<>();
+    @Builder.Default
     private List<LocalDateTime> times = new ArrayList<>();
     private int attempts;
+    @Builder.Default
     private boolean correct = false;
 }

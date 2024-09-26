@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,7 +55,14 @@ public class TokenService {
 
     @Bean
     private void applicationJWT() {
-        User admin = this.userService.findAllUsers().get().stream().filter(user -> "admin".equals(user.getUsername())).findFirst().get();
+        Optional<List<User>> usersOpt = this.userService.findAllUsers();
+
+        User admin = usersOpt
+                .flatMap(users -> users.stream()
+                        .filter(user -> "admin".equals(user.getUsername()))
+                        .findFirst())
+                .orElse(new User("admin", "defaultPassword"));
+
         String scope = admin.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));

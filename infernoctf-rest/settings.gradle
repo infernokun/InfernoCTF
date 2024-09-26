@@ -1,1 +1,4 @@
 rootProject.name = 'InfernoCTF'
+include 'main'
+include 'infernoctfapplication'
+

@@ -15,5 +15,6 @@ public class FlagAnswer {
     private String flag;
     private String username;
     private String questionId;
+    @Builder.Default
     private LocalDateTime submissionTime = LocalDateTime.now();
 }

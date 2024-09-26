@@ -47,13 +47,11 @@ export class AppComponent {
 
   openLoginModal(): void {
     this.dialogService.openLoginDialog().subscribe((res) => {
-      console.log('wtf, what', res);
     });
   }
 
   openRegisterModal(): void {
     this.dialogService.openRegisterDialog().subscribe((res) => {
-      console.log('wtf, what', res);
     });
   }
 
