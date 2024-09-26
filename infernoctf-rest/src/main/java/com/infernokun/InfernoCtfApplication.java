@@ -13,5 +13,4 @@ public class InfernoCtfApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(InfernoCtfApplication.class, args);
 	}
-
 }

@@ -3,8 +3,7 @@ package com.infernokun.models.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Getter
@@ -14,10 +13,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "flags")
 public class Flag {
     @Id
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
+    @UuidGenerator
     private String id;
     private String flag;
     private Boolean surroundWithTag;
