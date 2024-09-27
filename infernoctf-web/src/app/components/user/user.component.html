@@ -1,0 +1,30 @@
+<div class="user-container" *ngIf="!(loading$ | async) else loading">
+  <div *ngFor="let user of users" class="user-row">
+    <div class="user-info" *ngIf="!user.editMode">
+      <h2>{{ user.username }}</h2>
+      <p>{{ user.email }}</p>
+      <mat-select>
+        <mat-option *ngFor="let role of roles" [value]="role">{{ role }}</mat-option>
+      </mat-select>
+      <p>{{ user.role}}</p> <!-- Assuming role is an array -->
+      <p>{{ user.createdAt | date }}</p>
+      <input mat-button type="button" value="Edit" (click)="editUser(user)">
+      <input mat-button type="button" value="Delete" (click)="deleteUser(user.id!)">
+    </div>
+
+    <div class="user-edit" *ngIf="user.editMode">
+      <input [(ngModel)]="user.username" placeholder="Username">
+      <input [(ngModel)]="user.email" placeholder="Email">
+      <input [(ngModel)]="user.role" placeholder="Role (comma-separated)">
+      <p>{{ user.createdAt | date }}</p>
+      <input mat-button type="button" value="Save" (click)="saveUser(user)">
+      <input mat-button type="button" value="Cancel" (click)="cancelEdit(user)">
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="spinner-border" role="status">
+    <mat-spinner></mat-spinner>
+  </div>
+</ng-template>

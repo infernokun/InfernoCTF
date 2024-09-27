@@ -17,6 +17,7 @@ import { AuthInterceptor } from './services/auth/auth-interceptor.service';
 import { CTFMainComponent } from './components/ctf/ctf-main/ctf-main.component';
 import { RegisterComponent } from './components/register/register.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { UserComponent } from './components/user/user.component';
 
 export function init_app(environmentService: EnvironmentService) {
   return () => environmentService.load().then(() => {
@@ -33,7 +34,8 @@ export function init_app(environmentService: EnvironmentService) {
     EditDialogComponent,
     ViewDialogComponent,
     CTFMainComponent,
-    RegisterComponent
+    RegisterComponent,
+    UserComponent
   ],
   imports: [
     BrowserModule,

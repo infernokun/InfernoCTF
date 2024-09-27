@@ -43,6 +43,9 @@ public class UserService implements UserDetailsService {
         return this.passwordEncoder.matches(password, encodedPassword);
     }
     public Optional<List<User>> findAllUsers() {
+        this.userRepository.findAll().forEach((user -> {
+            user.setPassword("123");
+        }));
         return Optional.of(this.userRepository.findAll());
     }
 

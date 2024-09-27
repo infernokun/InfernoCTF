@@ -21,6 +21,9 @@ public class UserController {
         this.userService = userService;
     }
 
+    /*@GetMapping("{username}")
+    public ResponseEntity<User> lol(@PathVariable String roomId)*/
+
     @GetMapping("all")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(this.userService.findAllUsers().orElse(Collections.emptyList()));

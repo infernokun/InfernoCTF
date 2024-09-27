@@ -64,22 +64,25 @@ public class AuthenticationController {
 
     @PostMapping("/token")
     public ResponseEntity<LoginResponseDTO> revalidateToken(@RequestBody String token) {
+        /* Simulate backend delay
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        }*/
         return ResponseEntity.ok(this.authenticationService.revalidateToken(token));
     }
 
     @PostMapping("/token/check")
     public ResponseEntity<Boolean> checkToken(@RequestBody String token) {
         Optional<RefreshToken> refreshToken = this.refreshTokenService.findByToken(token);
+
+        /* Simulate backend delay
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        }*/
         if (refreshToken.isPresent()) {
             return ResponseEntity.ok(true);
         }

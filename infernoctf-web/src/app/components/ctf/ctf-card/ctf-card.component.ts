@@ -40,7 +40,8 @@ export class CTFCardComponent {
         });
       }
     });
-    /*this.authService.loading$.subscribe((loading) => {
+
+    this.authService.loading$.subscribe((loading) => {
       if (!loading) {
         this.ctfService.getAllChallenges().subscribe((ctfEntities: CTFEntity[]) => {
           if (ctfEntities) {
@@ -53,7 +54,7 @@ export class CTFCardComponent {
           console.log('message', message);
         });
       }
-    });*/
+    });
   }
 
   openViewDialog(challengeFormData: CTFEntity) {

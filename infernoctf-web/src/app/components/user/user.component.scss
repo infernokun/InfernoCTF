@@ -1,0 +1,33 @@
+.user-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.user-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.user-info,
+.user-edit {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.user-info h2,
+.user-edit input {
+  margin-right: 15px;
+}
+
+.user-edit input {
+  margin-right: 10px;
+}
+
+input[mat-button] {
+  margin-left: 10px;
+}
