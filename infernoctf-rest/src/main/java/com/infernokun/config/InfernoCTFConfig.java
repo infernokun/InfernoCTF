@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 @AllArgsConstructor
 public class InfernoCTFConfig {
     private String applicationName;
+    private String defaultAdminUsername;
+    private String defaultAdminPassword;
     private String chatService;
     private String chatSocket;
     private String apiKey;

@@ -35,6 +35,8 @@ server:
 
 infernoctf:
   applicationName: InfernoCTF
+  defaultAdminUsername: infernoctf_admin
+  defaultAdminPassword: password
   chatService: ""
   chatSocket: ""
 
