@@ -7,8 +7,8 @@ import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { CTFCardComponent } from './components/ctf/ctf-card/ctf-card.component';
 import { EnvironmentService } from './services/environment.service';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from './material.module';
 import { EditDialogComponent } from './components/common/edit-dialog/edit-dialog.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -18,6 +18,11 @@ import { CTFMainComponent } from './components/ctf/ctf-main/ctf-main.component';
 import { RegisterComponent } from './components/register/register.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserComponent } from './components/user/user.component';
+import { CommonDialogComponent } from './components/common/common-dialog/common-dialog.component';
+import { GenericDialogQuestionComponent } from './components/common/generic-dialog-question/generic-dialog-question.component';
+import { GenericAddObjectDialogFormComponent } from './components/common/generic-add-object-dialog-form/generic-add-object-dialog-form.component';
+import { SkeletonDirective } from './directives/skeleton.directive';
+import { SkeletonRectComponent } from './components/common/skeleton-rect/skeleton-rect.component';
 
 export function init_app(environmentService: EnvironmentService) {
   return () => environmentService.load().then(() => {
@@ -35,29 +40,31 @@ export function init_app(environmentService: EnvironmentService) {
     ViewDialogComponent,
     CTFMainComponent,
     RegisterComponent,
-    UserComponent
+    UserComponent,
+    CommonDialogComponent,
+    GenericDialogQuestionComponent,
+    GenericAddObjectDialogFormComponent,
+    SkeletonDirective,
+    SkeletonRectComponent
   ],
-  imports: [
-    BrowserModule,
+  bootstrap: [AppComponent], imports: [BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    HttpClientModule,
+    ReactiveFormsModule,
     FormsModule,
-    MaterialModule
-  ],
-  providers: [
-    {
-      provide: APP_INITIALIZER,
-      useFactory: init_app,
-      deps: [EnvironmentService],
-      multi: true,
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    }
-  ],
-  bootstrap: [AppComponent]
+    MaterialModule], providers: [
+      {
+        provide: APP_INITIALIZER,
+        useFactory: init_app,
+        deps: [EnvironmentService],
+        multi: true,
+      },
+      {
+        provide: HTTP_INTERCEPTORS,
+        useClass: AuthInterceptor,
+        multi: true
+      },
+      provideHttpClient(withInterceptorsFromDi())
+    ]
 })
 export class AppModule { }

@@ -35,7 +35,7 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
-    this.authService.isAuthenticated().subscribe((authenticated) => {
+    this.authService.isAuthenticated().subscribe((authenticated: any) => {
       if (authenticated) {
         console.log('Authenticated');
       } else {
@@ -46,12 +46,12 @@ export class AppComponent {
   }
 
   openLoginModal(): void {
-    this.dialogService.openLoginDialog().subscribe((res) => {
+    this.dialogService.openLoginDialog().subscribe((res: any) => {
     });
   }
 
   openRegisterModal(): void {
-    this.dialogService.openRegisterDialog().subscribe((res) => {
+    this.dialogService.openRegisterDialog().subscribe((res: any) => {
     });
   }
 

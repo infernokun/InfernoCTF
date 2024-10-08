@@ -22,7 +22,7 @@ export class UserComponent {
     private authService: AuthService
   ) {
     this.busy = true;
-    this.authService.loading$.subscribe((loading) => {
+    this.authService.loading$.subscribe((loading: any) => {
       if (!loading) {
         this.userService.getUsers().subscribe((users: User[]) => {
           if (users) {

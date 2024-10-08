@@ -1,11 +1,11 @@
 <div>
-    <h1 class="width-100-percent text-center margin-1x">
-        Homepage
-    </h1>
-    <ol *ngFor="let room of rooms$ | async">
-        <li>
-            <a [routerLink]="['/room/' + room.id]">{{ room.name }}</a>
-        </li>
-    </ol>
+  <h1 class="width-100-percent text-center margin-1x">
+    Homepage
+  </h1>
+  <button mat-button (click)="createRoom()" mat-success color="success">Create Room</button>
+  <ol *ngFor="let room of rooms$ | async">
+    <li>
+      <a [routerLink]="['/room/' + room.id]">{{ room.name }}</a>
+    </li>
+  </ol>
 </div>
-

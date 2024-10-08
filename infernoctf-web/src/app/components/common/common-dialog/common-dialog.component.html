@@ -1,0 +1,18 @@
+<div class="bg-alert padding-1x border border-radius">
+  <h1 class="enable-crlf" mat-dialog-title>{{ data.title }}</h1>
+</div>
+<div class="text-lg">
+  <ng-container *ngIf="data.template" mat-dialog-content [ngTemplateOutlet]="data.template"
+    [ngTemplateOutletContext]="{ model: data.context }"></ng-container>
+  <div *ngIf="!data.template" mat-dialog-content class="enable-crlf">
+    {{ data.message }}
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button *ngIf="data.showCancel" mat-button class="mat-raised-button transparent-button" (click)="cancel()">
+    Cancel
+  </button>
+  <button class="margin-spacer-left" mat-button class="mat-raised-button mat-accent" (click)="ok()">
+    OK
+  </button>
+</div>

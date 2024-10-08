@@ -19,4 +19,5 @@ export class RoomService extends BaseService {
   getRooms() {
     return this.get<any>(this.environmentService.settings?.restUrl + '/room');
   }
+
 }

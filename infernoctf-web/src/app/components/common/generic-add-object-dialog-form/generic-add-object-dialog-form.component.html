@@ -1,0 +1,26 @@
+<div class="container">
+  <h2 mat-dialog-title align="center" *skeleton="!data || !data.questions || !(data.questions.length > 0)">
+    {{ formatTitle(data.typeName) }}
+  </h2>
+  <br />
+  <div *skeleton="
+      !data || !data.questions || !(data.questions.length > 0);
+      height: '100px'
+    ">
+    <div *ngFor="let q of data.questions; let i = index" class="row align-items-center margin-min">
+      <app-generic-dialog-question class="width-100-percent" [question]="q"></app-generic-dialog-question>
+    </div>
+  </div>
+</div>
+<div class="row margin-top-1x ">
+  <div class="flex-fill">
+  </div>
+  <div>
+    <button [mat-dialog-close]='undefined' class="col interactive transparent-button mat-button">Cancel</button>
+  </div>
+  <div>
+    <button color="primary" class="col interactive mat-raised-button mat-accent margin-left-min" (click)="onSubmit()">
+      Submit
+    </button>
+  </div>
+</div>

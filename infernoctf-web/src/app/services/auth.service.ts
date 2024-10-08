@@ -22,12 +22,12 @@ export class AuthService {
 
   isAuthenticated(): Observable<boolean> {
     const token = localStorage.getItem('jwt');
-  
+
     if (!token) {
       // No token found, return false immediately
       return of(false);
     }
-  
+
     const decodedToken = this.decodeToken(token);
     if (!decodedToken || !decodedToken.exp || decodedToken.exp * 1000 <= Date.now()) {
       // Token expired, attempt revalidation
@@ -36,15 +36,15 @@ export class AuthService {
         catchError(() => of(false)) // If revalidation fails, return false
       );
     }
-    
+
     console.log('Token found and active');
-    
+
     // Token is still valid
     const payload: UserPayload = {
       username: decodedToken.sub,
       role: decodedToken.roles
     };
-    
+
     // Check if token is still valid from the server
     return this.checkTokenValidity(token, payload);
   }
