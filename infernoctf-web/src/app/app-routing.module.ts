@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'admin/users', component: UserComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: '', component: HomeComponent }, // Default route
-  { path: '**', redirectTo: '' } // Wildcard route for a n404 page, redirect to home
+  { path: '**', redirectTo: '' } // Wildcard route for a 404 page, redirect to home
 ];
 
 @NgModule({
