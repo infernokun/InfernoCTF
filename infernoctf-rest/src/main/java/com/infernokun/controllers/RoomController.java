@@ -1,5 +1,6 @@
 package com.infernokun.controllers;
 
+import com.infernokun.exceptions.RoomNotFoundException;
 import com.infernokun.models.entities.Room;
 import com.infernokun.services.RoomService;
 import org.springframework.http.HttpStatus;
@@ -19,11 +20,21 @@ public class RoomController {
     }
 
     @GetMapping
+    public ResponseEntity<Room> getRoomByName(@RequestParam("name") String roomName) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.roomService.findByRoomName(roomName));
+    }
+
+    @GetMapping("all")
     public ResponseEntity<List<Room>> getAllRooms() {
         return ResponseEntity.status(HttpStatus.OK).body(this.roomService.findAllRooms());
     }
 
-    @PostMapping("/many")
+    @PostMapping
+    public ResponseEntity<Room> createRoom(@RequestBody Room room) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.roomService.saveRoom(room));
+    }
+
+    @PostMapping("many")
     public ResponseEntity<List<Room>> createRooms(@RequestBody List<Room> rooms) {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.roomService.saveRooms(rooms));
     }

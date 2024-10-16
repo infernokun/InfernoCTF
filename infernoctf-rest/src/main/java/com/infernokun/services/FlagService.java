@@ -5,8 +5,10 @@ import com.infernokun.models.entities.CTFEntity;
 import com.infernokun.models.dto.FlagAnswer;
 import com.infernokun.models.entities.Flag;
 import com.infernokun.models.entities.User;
+import com.infernokun.repositories.FlagRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,13 +19,19 @@ public class FlagService {
     private final CTFEntityService ctfEntityService;
     private final UserService userService;
     private final AnsweredCTFEntityService answeredCTFEntityService;
+    private final FlagRepository flagRepository;
 
     private Logger LOGGER = LoggerFactory.getLogger(FlagService.class);
 
-    public FlagService(CTFEntityService ctfEntityService, UserService userService, AnsweredCTFEntityService answeredCTFEntityService) {
+    public FlagService(CTFEntityService ctfEntityService, UserService userService, AnsweredCTFEntityService answeredCTFEntityService, FlagRepository flagRepository) {
         this.ctfEntityService = ctfEntityService;
         this.userService = userService;
         this.answeredCTFEntityService = answeredCTFEntityService;
+        this.flagRepository = flagRepository;
+    }
+
+    public Flag saveFlag(Flag flag) {
+        return this.flagRepository.save(flag);
     }
 
     public boolean validateFlag(FlagAnswer flagAnswer) {
@@ -40,6 +48,7 @@ public class FlagService {
         User user = this.userService.findUserByUsername(username);
         Optional<CTFEntity> ctfEntityOptional =  this.ctfEntityService.findCTFEntityById(flagAnswer.getQuestionId());
         if (ctfEntityOptional.isEmpty()) { return Optional.empty(); }
+
 
         Optional<AnsweredCTFEntity> answeredCTFEntityOptional = this.
                 answeredCTFEntityService.

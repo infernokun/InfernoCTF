@@ -9,6 +9,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class ApplicationInitializer implements ApplicationRunner {
 

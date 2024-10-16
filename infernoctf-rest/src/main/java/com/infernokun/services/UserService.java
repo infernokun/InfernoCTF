@@ -27,7 +27,8 @@ public class UserService implements UserDetailsService {
     }
 
     public User findUserByUsername(String username) throws UsernameNotFoundException {
-        return this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("user is not valid"));
+        return this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User is not valid"));
     }
 
     public void registerUser(User user) {
@@ -43,9 +44,6 @@ public class UserService implements UserDetailsService {
         return this.passwordEncoder.matches(password, encodedPassword);
     }
     public Optional<List<User>> findAllUsers() {
-        this.userRepository.findAll().forEach((user -> {
-            user.setPassword("123");
-        }));
         return Optional.of(this.userRepository.findAll());
     }
 

@@ -3,9 +3,12 @@ package com.infernokun.controllers;
 import com.infernokun.models.entities.CTFEntity;
 import com.infernokun.models.entities.Flag;
 import com.infernokun.services.CTFEntityService;
+import com.infernokun.services.FlagService;
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +23,14 @@ import java.util.UUID;
 public class CTFEntityController {
     private final Logger LOGGER =  LoggerFactory.getLogger(CTFEntityController.class);
     private final CTFEntityService ctfEntityService;
+    private final FlagService flagService;
 
-    public CTFEntityController(CTFEntityService ctfEntityService) {
+    @Autowired
+    private EntityManager entityManager;
+
+    public CTFEntityController(CTFEntityService ctfEntityService, FlagService flagService) {
         this.ctfEntityService = ctfEntityService;
+        this.flagService = flagService;
     }
 
     @GetMapping
@@ -45,14 +53,32 @@ public class CTFEntityController {
 
     @PostMapping
     public ResponseEntity<CTFEntity> createCTFEntity(@RequestBody CTFEntity ctfEntity) {
-        for (Flag flag : ctfEntity.getFlags()) {
+        // Save the CTFEntity first to generate an ID
+        Optional<CTFEntity> savedCTFEntityOptional = ctfEntityService.saveCTFEntity(ctfEntity);
+
+        // If the CTFEntity wasn't saved successfully, return not found
+        if (savedCTFEntityOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        CTFEntity savedCTFEntity = savedCTFEntityOptional.get();
+
+        // Set the saved CTFEntity in the flags and save them
+        for (Flag flag : savedCTFEntity.getFlags()) {
             if (flag.getId() == null) {
                 flag.setId(UUID.randomUUID().toString());
             }
+            // Set the CTFEntity reference
+            flag.setCtfEntity(savedCTFEntity);
+
+            // Save the flag now that it has a persistent CTFEntity reference
+            this.flagService.saveFlag(flag);
         }
-        Optional<CTFEntity> savedEntity = ctfEntityService.saveCTFEntity(ctfEntity);
-        return savedEntity.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+
+        // Return the saved CTFEntity in the response
+        return ResponseEntity.ok(savedCTFEntity);
     }
+
 
     @PostMapping("/many")
     public ResponseEntity<List<CTFEntity>> createCTFEntities(@RequestBody List<CTFEntity> ctfEntities) {
@@ -60,6 +86,9 @@ public class CTFEntityController {
                 entity.getFlags().forEach(flag -> {
                     if (flag.getId() == null) {
                         flag.setId(UUID.randomUUID().toString());
+                    }
+                    if (flag.getCtfEntity() == null) {
+                        flag.setCtfEntity(entity);
                     }
                 })
         );

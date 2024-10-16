@@ -3,8 +3,8 @@ spring:
     name: InfernoCTF
   datasource:
     url: jdbc:postgresql://0.0.0.0:5432/infernoctf
-    username: main
-    password: assword
+    username: infernokun
+    password: password
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
