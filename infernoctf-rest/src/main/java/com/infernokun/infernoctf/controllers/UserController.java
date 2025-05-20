@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("user")
+@RequestMapping("/api/user")
 public class UserController {
     private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;

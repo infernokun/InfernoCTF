@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("answer")
+@RequestMapping("/api/answer")
 @CrossOrigin
 public class FlagAnswerController {
     private final FlagService flagService;

@@ -19,7 +19,7 @@ import java.util.UUID;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("ctf-entity")
+@RequestMapping("/api/ctf-entity")
 public class CTFEntityController {
     private final Logger LOGGER =  LoggerFactory.getLogger(CTFEntityController.class);
     private final CTFEntityService ctfEntityService;

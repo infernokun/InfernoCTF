@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/api/auth")
 @CrossOrigin
 public class AuthenticationController {
     private final Logger LOGGER = LoggerFactory.getLogger(AuthenticationController.class);

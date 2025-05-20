@@ -1,0 +1,55 @@
+services:
+  infernoctf-web:
+    image: infernokun/infernoctf-web:latest
+    restart: always
+    environment:
+      - BASE_URL=http://infernoctf-web
+      - REST_URL=/api
+    ports:
+      - "8774:80"
+    volumes:
+      - infernoctf-web:/var/log/nginx
+    depends_on:
+      infernoctf-db:
+        condition: service_healthy
+
+  infernoctf-db:
+    image: postgres:17.4
+    restart: always
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER:-infernoctf}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-infernoctf}"
+      POSTGRES_DB: "${POSTGRES_DB:-infernoctf}"
+    volumes:
+      - infernoctf-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-infernoctf}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  infernoctf-rest:
+    image: infernokun/infernoctf-rest:latest
+    restart: always
+    ports:
+      - "8775:8080"
+    environment:
+      DB_IP: "${POSTGRES_IP:-infernoctf-db}"
+      DB_NAME: "${POSTGRES_DB:-infernoctf}"
+      DB_USER: "${POSTGRES_USER:-infernoctf}"
+      DB_PASS: "${POSTGRES_PASSWORD:-infernoctf}"
+      DB_PORT: "${DB_PORT:-5432}"
+      ENCRYPTION_KEY: "${ENCRYPTION_KEY:-secret_key}"
+      PORT: 8080
+    depends_on:
+      - infernoctf-db
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  infernoctf-db:
+    driver: local
+  infernoctf-web:
