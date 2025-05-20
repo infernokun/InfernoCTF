@@ -2,8 +2,9 @@ import { Component, ViewChild } from '@angular/core';
 import { AuthService, UserPayload } from './services/auth.service';
 import { DialogService } from './services/dialog.service';
 import { LoginComponent } from './components/login/login.component';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, Subject, takeUntil } from 'rxjs';
 import { LoginService } from './services/login.service';
+import { User } from './models/user.model';
 
 declare var require: any;
 const { version: appVersion } = require('../../package.json');
@@ -18,11 +19,15 @@ export class AppComponent {
   header: string = 'UNCLASSIFIED';
   footer: string = 'UNCLASSIFIED';
 
-  payload$: Observable<UserPayload | undefined> = this.authService.payload$;
+  loadingUser$: Observable<boolean> = of(false);
+  loggedInUser$: Observable<User | undefined> | undefined;
+  
   appVersion: any;
   bannerDisplayStyle: string = 'green-white';
 
   loading$ = this.authService.loading$;
+
+  private unsubscribe$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
@@ -35,15 +40,19 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
-    this.authService.isAuthenticated().subscribe((authenticated: any) => {
-      if (authenticated) {
-        console.log('Authenticated');
-      } else {
-        console.log('Not authenticated');
-      }
-      this.authService.loadingSubject.next(false);
-    });
+    this.checkAuthentication();
   }
+
+  private checkAuthentication() {
+    this.authService
+      .isAuthenticated()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(authenticated => {
+        console.log(authenticated ? 'Authenticated' : 'Not authenticated');
+        this.authService.setLoading(false);
+      });
+  }
+
 
   openLoginModal(): void {
     this.dialogService.openLoginDialog().subscribe((res: any) => {

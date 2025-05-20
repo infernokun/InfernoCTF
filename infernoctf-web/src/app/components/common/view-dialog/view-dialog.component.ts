@@ -3,7 +3,7 @@ import { CTFEntity } from '../../../models/ctf-entity.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CTFService } from '../../../services/ctf.service';
 import { FlagAnswer } from '../../../models/flag-answer.model';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService, UserPayload } from '../../../services/auth.service';
 import { BehaviorSubject, Observable, take } from 'rxjs';
 
 @Component({
@@ -53,11 +53,11 @@ export class ViewDialogComponent {
   }
 
   checkAnswer(challenge: CTFEntity): void {
-    this.authService.payload$.pipe(take(1)).subscribe((payload) => {
+    this.authService.payload$.pipe(take(1)).subscribe((payload: UserPayload | undefined) => {
       if (!payload) {
         return;
       }
-      const flag: FlagAnswer = new FlagAnswer(this.answer, payload.username, challenge.id!);
+      const flag: FlagAnswer = new FlagAnswer(this.answer, payload.user.username!, challenge.id!);
       this.ctfService.answerChallenge(flag).subscribe((res) => {
         if (res) {
           if (res.correct === true) {

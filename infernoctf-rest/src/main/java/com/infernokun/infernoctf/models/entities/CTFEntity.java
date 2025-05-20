@@ -20,11 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "ctf_entity")
-public class CTFEntity {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @UuidGenerator
-    private String id;
+public class CTFEntity extends StoredObject {
     private String question;
     private Integer maxAttempts;
     @ManyToOne(fetch = FetchType.EAGER)

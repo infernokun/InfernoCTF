@@ -24,7 +24,7 @@ export class UserComponent {
     this.busy = true;
     this.authService.loading$.subscribe((loading: any) => {
       if (!loading) {
-        this.userService.getUsers().subscribe((users: User[]) => {
+        this.userService.users$.subscribe((users: User[]) => {
           if (users) {
             this.users = users;
             this.busy = false;
@@ -40,7 +40,7 @@ export class UserComponent {
     user.editMode = false;
   }
 
-  public deleteUser(userId: number) {
+  public deleteUser(userId: string) {
   }
 
   public editUser(user: User) {

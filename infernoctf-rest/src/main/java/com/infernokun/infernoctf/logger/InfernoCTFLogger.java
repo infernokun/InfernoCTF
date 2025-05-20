@@ -21,16 +21,13 @@ public class InfernoCTFLogger implements Filter {
         try {
             filterChain.doFilter(servletRequest, servletResponse);
             if (httpResponse != null && !excludedUrls.contains(requestUri)) {
-                LOGGER.info(String.format("%s \"%s\" %d",
-                        httpRequest.getRemoteAddr(),
-                        httpRequest.getMethod() + " " + httpRequest.getRequestURI() +
-                                (httpRequest.getQueryString() != null ? "?" +
-                                        httpRequest.getQueryString() : "") + " " +
-                                httpRequest.getProtocol(),
-                        httpResponse.getStatus()));
+                LOGGER.info("{} \"{}\" {}", httpRequest.getRemoteAddr(), httpRequest.getMethod() + " " + httpRequest.getRequestURI() +
+                        (httpRequest.getQueryString() != null ? "?" +
+                                httpRequest.getQueryString() : "") + " " +
+                        httpRequest.getProtocol(), httpResponse.getStatus());
             }
         } catch (IOException ex) {
-            LOGGER.error("yikes: " + httpRequest.getRequestURI());
+            LOGGER.error("yikes: {}", httpRequest.getRequestURI());
         }
     }
 }

@@ -15,10 +15,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedMethods("OPTIONS", "HEAD", "PUT", "POST", "DELETE", "PATH")
-                .allowCredentials(true)
-                .allowedHeaders("*")
-                .allowedOriginPatterns("*");
+                .allowedOriginPatterns("*")  // Allow all origins
+                .allowedMethods("*")         // Allow all HTTP methods
+                .allowedHeaders("*")         // Allow all headers
+                .allowCredentials(false);    // Do not require credentials
     }
 
     @Bean

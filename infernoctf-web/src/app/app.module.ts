@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule, inject, provideAppInitializer } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -47,24 +47,22 @@ export function init_app(environmentService: EnvironmentService) {
     SkeletonDirective,
     SkeletonRectComponent
   ],
-  bootstrap: [AppComponent], imports: [BrowserModule,
-    BrowserAnimationsModule,
+  imports: [
+    BrowserModule,
     AppRoutingModule,
+    BrowserAnimationsModule,
     ReactiveFormsModule,
     FormsModule,
-    MaterialModule], providers: [
-      {
-        provide: APP_INITIALIZER,
-        useFactory: init_app,
-        deps: [EnvironmentService],
-        multi: true,
-      },
-      {
-        provide: HTTP_INTERCEPTORS,
-        useClass: AuthInterceptor,
-        multi: true
-      },
-      provideHttpClient(withInterceptorsFromDi())
-    ]
+    MaterialModule
+  ],
+  providers: [
+    EnvironmentService,
+    provideAppInitializer(() => {
+        const initializerFn = (init_app)(inject(EnvironmentService));
+        return initializerFn();
+      }),
+    provideHttpClient(withInterceptorsFromDi())
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

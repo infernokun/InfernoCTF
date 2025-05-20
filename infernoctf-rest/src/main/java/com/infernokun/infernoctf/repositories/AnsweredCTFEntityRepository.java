@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface AnsweredCTFEntityRepository extends JpaRepository<AnsweredCTFEntity, String> {
-    Optional<AnsweredCTFEntity> findByUserIdAndCtfEntityId(Long userId, String ctfEntityId);
+    Optional<AnsweredCTFEntity> findByUserIdAndCtfEntityId(String userId, String ctfEntityId);
 }

@@ -40,12 +40,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
+        //http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/auth/**", "/socket/**", "/ctf-entity/**").permitAll();
-                    auth.requestMatchers("/admin/**").permitAll(); //.hasRole("ADMIN");
-                    auth.requestMatchers("/user/**", "/answer/**", "/room/**").permitAll(); //.hasAnyRole("ADMIN", "USER","MEMBER", "Member");
+                    auth.requestMatchers("/**").permitAll();
+                    //auth.requestMatchers("/api/**", "/socket/**").permitAll();
+                    //auth.requestMatchers("/user/**", "/answer/**", "/room/**").permitAll(); //.hasAnyRole("ADMIN", "USER","MEMBER", "Member");
                     auth.anyRequest().authenticated();
                 });
 

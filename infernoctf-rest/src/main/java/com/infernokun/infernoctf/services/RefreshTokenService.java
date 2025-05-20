@@ -1,11 +1,13 @@
 package com.infernokun.infernoctf.services;
 
+import com.infernokun.infernoctf.exceptions.TokenException;
 import com.infernokun.infernoctf.models.entities.RefreshToken;
 import com.infernokun.infernoctf.models.entities.User;
 import com.infernokun.infernoctf.repositories.RefreshTokenRepository;
 import com.infernokun.infernoctf.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,59 +20,65 @@ public class RefreshTokenService {
     private final UserRepository userRepository;
 
     private final Logger LOGGER = LoggerFactory.getLogger(RefreshTokenService.class);
-
     public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
     }
 
-    public RefreshToken createRefreshToken(String username, String token, Instant expiration) {
-        Optional<User> user = this.userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            // Check if a refresh token already exists for the user
-            Optional<RefreshToken> existingToken = this.findByUserId(user.get().getId());
-            if (existingToken.isPresent()) {
-                // Update the existing refresh token
-                existingToken.get().setToken(token);
-                existingToken.get().setCreationDate(Instant.now());
-                existingToken.get().setExpirationDate(expiration);
-                return this.refreshTokenRepository.save(existingToken.get());
-            } else {
-                // Create a new refresh token
-                RefreshToken refreshToken = RefreshToken.builder()
-                        .user(user.get())
-                        .token(token)
-                        .creationDate(Instant.now())
-                        .expirationDate(expiration)
-                        .build();
-                return this.refreshTokenRepository.save(refreshToken);
-            }
+    public void createRefreshToken(String username, String token, Instant expiration) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        // Find existing token
+        Optional<RefreshToken> existingTokenOpt = this.refreshTokenRepository.findByUserId(user.getId());
+
+        if (existingTokenOpt.isPresent()) {
+            RefreshToken existingToken = existingTokenOpt.get();
+
+            existingToken.setToken(token);
+            existingToken.setCreationDate(Instant.now());
+            existingToken.setExpirationDate(expiration);
+            refreshTokenRepository.save(existingToken);
+        } else {
+            // If no existing token, create a new one
+            RefreshToken newToken = RefreshToken.builder()
+                    .user(user)
+                    .token(token)
+                    .creationDate(Instant.now())
+                    .expirationDate(expiration)
+                    .build();
+
+            refreshTokenRepository.save(newToken);
         }
-        return null;
     }
 
-    public Optional<RefreshToken> findByUserId(Long id) {
+    public Optional<RefreshToken> findByUserId(String id) {
+        // Bypass cache for User lookups to avoid serialization issues
         return this.refreshTokenRepository.findByUserId(id);
     }
 
-    public Optional<RefreshToken> findByToken(String token) {
-        return this.refreshTokenRepository.findByToken(token);
+    public RefreshToken findByToken(String token) {
+        // Bypass cache to avoid serialization issues
+        return this.refreshTokenRepository.findByToken(token).orElseThrow(
+                () -> new TokenException("Failed to find token."));
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpirationDate().compareTo(Instant.now()) < 0) {
+            // Token expired - remove from DB and cache
             this.refreshTokenRepository.delete(token);
+
             throw new RuntimeException(token.getToken() + " Refresh token is expired. Please make a new login..!");
         }
         return token;
     }
 
     @Transactional
-    public Optional<RefreshToken> deleteToken(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
+    public Optional<RefreshToken> deleteToken(String id) {
+        Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             LOGGER.info("LOGOUT COMPLETE");
-            return refreshTokenRepository.deleteByUserId(user.get().getId());
+            return refreshTokenRepository.deleteByUserId(id);
         } else {
             return Optional.empty();
         }

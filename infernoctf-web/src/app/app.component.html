@@ -31,7 +31,7 @@
   </div>
   <div class="display-flex flex-row width-100-percent justify-content-end">
     <article class="margin-right-2x display-flex flex-column justify-content-center">
-      <div *ngIf="(payload$ | async) as payload else login">
+      <div *ngIf="(loggedInUser$ | async) as payload else login">
         <div>{{ payload.username }} | {{ payload.role }}</div>
       </div>
     </article>
@@ -39,7 +39,7 @@
       <mat-icon>menu</mat-icon>
     </button>
     <mat-menu #theMenu="matMenu">
-      <div *ngIf="payload$ | async" class="toolbar-menu-options-wrapper">
+      <div *ngIf="loggedInUser$ | async" class="toolbar-menu-options-wrapper">
         <button mat-menu-item>Profile</button>
         <button mat-menu-item (click)="logoutButton()">Logout</button>
       </div>

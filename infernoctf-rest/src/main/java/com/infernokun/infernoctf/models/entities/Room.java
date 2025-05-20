@@ -17,14 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Room {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    private String id;
+public class Room extends StoredObject {
     private String name;
     private LocalDateTime createdAt = LocalDateTime.now();
     @ManyToOne(fetch = FetchType.EAGER)

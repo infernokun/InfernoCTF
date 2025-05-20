@@ -1,16 +1,13 @@
 package com.infernokun.infernoctf.controllers;
 
-import com.infernokun.infernoctf.exceptions.AuthFailedException;
-import com.infernokun.infernoctf.exceptions.WrongPasswordException;
+import com.infernokun.infernoctf.models.ApiResponse;
 import com.infernokun.infernoctf.models.entities.RefreshToken;
 import com.infernokun.infernoctf.models.dto.LoginResponseDTO;
 import com.infernokun.infernoctf.models.dto.RegistrationDTO;
-import com.infernokun.infernoctf.models.entities.User;
 import com.infernokun.infernoctf.services.AuthenticationService;
 import com.infernokun.infernoctf.services.RefreshTokenService;
 import com.infernokun.infernoctf.services.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,84 +16,62 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin
+@Slf4j
 public class AuthenticationController {
-    private final Logger LOGGER = LoggerFactory.getLogger(AuthenticationController.class);
     private final AuthenticationService authenticationService;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
 
-    public AuthenticationController(AuthenticationService authenticationService, UserService userService, RefreshTokenService refreshTokenService) {
+    public AuthenticationController(AuthenticationService authenticationService, UserService userService,
+                                    RefreshTokenService refreshTokenService) {
         this.authenticationService = authenticationService;
         this.userService = userService;
         this.refreshTokenService = refreshTokenService;
     }
 
-    @PostMapping(value = "/register", produces = "text/plain;charset=UTF-8", consumes = "application/json")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        if (user == null || user.getUsername() == null || user.getPassword() == null) {
-            return ResponseEntity.badRequest().body("Username and password are required.");
-        }
-
-        boolean userExists = this.userService.existsByUsernameOrEmail(user);
-        if (userExists) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists!");
-        }
-
-        this.authenticationService.registerUser(user);
-        LOGGER.info("User registered: {}", user.getUsername());
-        return ResponseEntity.status(HttpStatus.OK).body("User registered successfully.");
+    @PostMapping(value = "/register", consumes = "application/json")
+    public ResponseEntity<ApiResponse<Boolean>> registerUser(@RequestBody RegistrationDTO registrationDTO) {
+        return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+                .code(HttpStatus.OK.value())
+                .message("User registered successfully.")
+                .data(authenticationService.registerUser(registrationDTO))
+                .build());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody RegistrationDTO user) {
-        try {
-            LoginResponseDTO loginResponseDTO = this.authenticationService.loginUser(
-                    user.getUsername(), user.getPassword());
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> loginUser(@RequestBody RegistrationDTO user) {
+        LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
+                user.getUsername(), user.getPassword());
 
-            return ResponseEntity.ok(loginResponseDTO);
-        } catch (WrongPasswordException ex) {
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        } catch (AuthFailedException ex) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        return ResponseEntity.ok(ApiResponse.<LoginResponseDTO>builder()
+                .code(HttpStatus.OK.value())
+                .message("Login successful..")
+                .data(loginResponseDTO)
+                .build());
     }
 
     @PostMapping("/token")
-    public ResponseEntity<LoginResponseDTO> revalidateToken(@RequestBody String token) {
-        /* Simulate backend delay
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }*/
-        return ResponseEntity.ok(this.authenticationService.revalidateToken(token));
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> revalidateToken(@RequestBody String token) {
+        return ResponseEntity.ok(ApiResponse.<LoginResponseDTO>builder()
+                .code(HttpStatus.OK.value())
+                .message("Token revalidated")
+                .data(authenticationService.revalidateToken(token))
+                .build());
     }
 
     @PostMapping("/token/check")
-    public ResponseEntity<Boolean> checkToken(@RequestBody String token) {
-        Optional<RefreshToken> refreshToken = this.refreshTokenService.findByToken(token);
-
-        /* Simulate backend delay
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }*/
-        if (refreshToken.isPresent()) {
-            return ResponseEntity.ok(true);
-        }
-        return ResponseEntity.ok(false);
+    public ResponseEntity<ApiResponse<Boolean>> checkToken(@RequestBody String token) {
+        return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+                .code(HttpStatus.OK.value())
+                .message("Token revalidated")
+                .data(refreshTokenService.findByToken(token) != null)
+                .build());
     }
 
-    @DeleteMapping("/token/logout/{username}")
-    public ResponseEntity<?> logoutUser(@PathVariable String username) {
-        Optional<RefreshToken> refreshTokenOptional = refreshTokenService.deleteToken(username);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    @DeleteMapping("/token/logout/{id}")
+    public ResponseEntity<?> logoutUser(@PathVariable String id) {
+        Optional<RefreshToken> refreshTokenOptional = refreshTokenService.deleteToken(id);
+
         if (refreshTokenOptional.isPresent()) {
             return ResponseEntity.noContent().build();
         } else {

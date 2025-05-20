@@ -11,10 +11,7 @@ import org.hibernate.annotations.UuidGenerator;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "flags")
-public class Flag {
-    @Id
-    @UuidGenerator
-    private String id;
+public class Flag extends StoredObject {
     private String flag;
     private Boolean surroundWithTag;
     private Boolean caseSensitive;

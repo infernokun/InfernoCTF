@@ -1,32 +1,72 @@
 package com.infernokun.infernoctf.exceptions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpHeaders;
+import com.infernokun.infernoctf.models.ApiResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @ExceptionHandler({UsernameNotFoundException.class, RoomNotFoundException.class})
-    public ResponseEntity<Map<String, String>> handleUserNotFound(Exception ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", ex.getMessage());
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<String>> handleResourceNotFoundException(
+            ResourceNotFoundException ex) {
+        ApiResponse<String> response = ApiResponse.<String>builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .message("ResourceNotFoundException: " + ex.getMessage())
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    @ExceptionHandler(WrongPasswordException.class)
+    public ResponseEntity<ApiResponse<String>> handleWrongPasswordException(WrongPasswordException ex) {
+        ApiResponse<String> response = ApiResponse.<String>builder()
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .message("WrongPasswordException: " + ex.getMessage())
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
 
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .headers(headers)
-                .body(errorResponse);
+    @ExceptionHandler(AuthFailedException.class)
+    public ResponseEntity<ApiResponse<Boolean>> handleAuthFailedException(AuthFailedException ex) {
+        ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .message("AuthFailedException: " + ex.getMessage())
+                .data(false)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(TokenException.class)
+    public ResponseEntity<ApiResponse<Boolean>> handleTokenException(TokenException ex) {
+        ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .message("TokenException: " + ex.getMessage())
+                .data(false)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResponse<?>> handleRuntimeException(RuntimeException ex) {
+        ApiResponse<?> response = ApiResponse.<String>builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message("RuntimeException: " + ex.getMessage())
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<?>> handleGeneralException(Exception ex) {
+        ApiResponse<?> response = ApiResponse.<String>builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message("Exception: " + ex.getMessage())
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

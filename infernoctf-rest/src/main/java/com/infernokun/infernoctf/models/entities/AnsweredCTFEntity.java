@@ -15,11 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "answered_ctf_entity")
-public class AnsweredCTFEntity {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @UuidGenerator
-    private String id;
+public class AnsweredCTFEntity extends StoredObject {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

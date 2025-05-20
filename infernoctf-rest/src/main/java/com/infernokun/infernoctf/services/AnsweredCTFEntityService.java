@@ -14,7 +14,7 @@ public class AnsweredCTFEntityService {
         this.answeredCTFEntityRepository = answeredCTFEntityRepository;
     }
 
-    public Optional<AnsweredCTFEntity> findByUserIdAndCtfEntityId(Long userId, String ctfEntityId) {
+    public Optional<AnsweredCTFEntity> findByUserIdAndCtfEntityId(String userId, String ctfEntityId) {
         return this.answeredCTFEntityRepository.findByUserIdAndCtfEntityId(userId, ctfEntityId);
     }
 
