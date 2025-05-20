@@ -1,4 +1,4 @@
-package com.infernokun.config.feign;
+package com.infernokun.infernoctf.config.feign;
 
 
 import feign.HeaderMap;

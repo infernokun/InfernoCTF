@@ -1,9 +1,9 @@
-package com.infernokun.services;
+package com.infernokun.infernoctf.services;
 
-import com.infernokun.models.entities.RefreshToken;
-import com.infernokun.models.entities.User;
-import com.infernokun.repositories.RefreshTokenRepository;
-import com.infernokun.repositories.UserRepository;
+import com.infernokun.infernoctf.models.entities.RefreshToken;
+import com.infernokun.infernoctf.models.entities.User;
+import com.infernokun.infernoctf.repositories.RefreshTokenRepository;
+import com.infernokun.infernoctf.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

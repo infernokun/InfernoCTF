@@ -1,4 +1,4 @@
-package com.infernokun.logger;
+package com.infernokun.infernoctf.logger;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

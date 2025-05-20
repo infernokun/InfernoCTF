@@ -1,7 +1,7 @@
-package com.infernokun.controllers;
+package com.infernokun.infernoctf.controllers;
 
-import com.infernokun.models.entities.User;
-import com.infernokun.services.UserService;
+import com.infernokun.infernoctf.models.entities.User;
+import com.infernokun.infernoctf.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

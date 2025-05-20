@@ -1,14 +1,14 @@
-package com.infernokun.controllers;
+package com.infernokun.infernoctf.controllers;
 
-import com.infernokun.exceptions.AuthFailedException;
-import com.infernokun.exceptions.WrongPasswordException;
-import com.infernokun.models.entities.RefreshToken;
-import com.infernokun.models.dto.LoginResponseDTO;
-import com.infernokun.models.dto.RegistrationDTO;
-import com.infernokun.models.entities.User;
-import com.infernokun.services.AuthenticationService;
-import com.infernokun.services.RefreshTokenService;
-import com.infernokun.services.UserService;
+import com.infernokun.infernoctf.exceptions.AuthFailedException;
+import com.infernokun.infernoctf.exceptions.WrongPasswordException;
+import com.infernokun.infernoctf.models.entities.RefreshToken;
+import com.infernokun.infernoctf.models.dto.LoginResponseDTO;
+import com.infernokun.infernoctf.models.dto.RegistrationDTO;
+import com.infernokun.infernoctf.models.entities.User;
+import com.infernokun.infernoctf.services.AuthenticationService;
+import com.infernokun.infernoctf.services.RefreshTokenService;
+import com.infernokun.infernoctf.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.infernokun.exceptions;
+package com.infernokun.infernoctf.exceptions;
 
 import org.springframework.security.core.AuthenticationException;
 

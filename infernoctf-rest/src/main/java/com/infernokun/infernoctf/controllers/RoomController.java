@@ -1,8 +1,7 @@
-package com.infernokun.controllers;
+package com.infernokun.infernoctf.controllers;
 
-import com.infernokun.exceptions.RoomNotFoundException;
-import com.infernokun.models.entities.Room;
-import com.infernokun.services.RoomService;
+import com.infernokun.infernoctf.models.entities.Room;
+import com.infernokun.infernoctf.services.RoomService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

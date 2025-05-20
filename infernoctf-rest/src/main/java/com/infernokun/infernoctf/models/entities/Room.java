@@ -1,6 +1,6 @@
-package com.infernokun.models.entities;
+package com.infernokun.infernoctf.models.entities;
 
-import com.infernokun.models.constants.InfernoCTFConstants;
+import com.infernokun.infernoctf.models.constants.InfernoCTFConstants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,6 @@
-package com.infernokun.config;
+package com.infernokun.infernoctf.config;
 
-import com.infernokun.logger.InfernoCTFLogger;
+import com.infernokun.infernoctf.logger.InfernoCTFLogger;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

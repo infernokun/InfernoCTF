@@ -1,6 +1,6 @@
-package com.infernokun.config.websocket;
+package com.infernokun.infernoctf.config.websocket;
 
-import com.infernokun.websocket.ServerHandler;
+import com.infernokun.infernoctf.websocket.ServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.infernokun.models.entities;
+package com.infernokun.infernoctf.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;

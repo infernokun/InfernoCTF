@@ -1,12 +1,11 @@
-package com.infernokun.services;
+package com.infernokun.infernoctf.services;
 
-import com.infernokun.exceptions.RoomNotFoundException;
-import com.infernokun.models.entities.Room;
-import com.infernokun.repositories.RoomRepository;
+import com.infernokun.infernoctf.exceptions.RoomNotFoundException;
+import com.infernokun.infernoctf.models.entities.Room;
+import com.infernokun.infernoctf.repositories.RoomRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RoomService {

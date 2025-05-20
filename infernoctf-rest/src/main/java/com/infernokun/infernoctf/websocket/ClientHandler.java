@@ -1,11 +1,11 @@
-package com.infernokun.websocket;
+package com.infernokun.infernoctf.websocket;
 
-import com.infernokun.config.InfernoCTFConfig;
+import com.infernokun.infernoctf.config.InfernoCTFConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.infernokun.config.websocket.ClientConfig;
+import com.infernokun.infernoctf.config.websocket.ClientConfig;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

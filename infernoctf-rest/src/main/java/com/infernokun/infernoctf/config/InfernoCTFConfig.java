@@ -1,4 +1,4 @@
-package com.infernokun.config;
+package com.infernokun.infernoctf.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

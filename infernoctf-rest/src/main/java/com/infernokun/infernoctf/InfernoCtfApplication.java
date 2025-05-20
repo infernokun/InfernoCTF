@@ -1,4 +1,4 @@
-package com.infernokun;
+package com.infernokun.infernoctf;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

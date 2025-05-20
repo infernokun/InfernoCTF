@@ -1,14 +1,13 @@
-package com.infernokun.services;
+package com.infernokun.infernoctf.services;
 
-import com.infernokun.models.entities.AnsweredCTFEntity;
-import com.infernokun.models.entities.CTFEntity;
-import com.infernokun.models.dto.FlagAnswer;
-import com.infernokun.models.entities.Flag;
-import com.infernokun.models.entities.User;
-import com.infernokun.repositories.FlagRepository;
+import com.infernokun.infernoctf.models.entities.AnsweredCTFEntity;
+import com.infernokun.infernoctf.models.entities.CTFEntity;
+import com.infernokun.infernoctf.models.dto.FlagAnswer;
+import com.infernokun.infernoctf.models.entities.Flag;
+import com.infernokun.infernoctf.models.entities.User;
+import com.infernokun.infernoctf.repositories.FlagRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

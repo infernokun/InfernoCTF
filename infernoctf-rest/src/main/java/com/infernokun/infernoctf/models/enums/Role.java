@@ -1,4 +1,4 @@
-package com.infernokun.models.enums;
+package com.infernokun.infernoctf.models.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;

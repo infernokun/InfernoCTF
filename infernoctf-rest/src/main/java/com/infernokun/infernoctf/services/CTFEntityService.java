@@ -1,9 +1,9 @@
-package com.infernokun.services;
+package com.infernokun.infernoctf.services;
 
-import com.infernokun.models.entities.CTFEntity;
-import com.infernokun.models.entities.Flag;
-import com.infernokun.repositories.CTFEntityRepository;
-import com.infernokun.repositories.FlagRepository;
+import com.infernokun.infernoctf.models.entities.CTFEntity;
+import com.infernokun.infernoctf.models.entities.Flag;
+import com.infernokun.infernoctf.repositories.CTFEntityRepository;
+import com.infernokun.infernoctf.repositories.FlagRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

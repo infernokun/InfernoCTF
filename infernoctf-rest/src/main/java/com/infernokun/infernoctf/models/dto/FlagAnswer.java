@@ -1,4 +1,4 @@
-package com.infernokun.models.dto;
+package com.infernokun.infernoctf.models.dto;
 
 import lombok.*;
 

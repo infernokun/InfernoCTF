@@ -1,6 +1,6 @@
-package com.infernokun.repositories;
+package com.infernokun.infernoctf.repositories;
 
-import com.infernokun.models.entities.AnsweredCTFEntity;
+import com.infernokun.infernoctf.models.entities.AnsweredCTFEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
-package com.infernokun.services;
+package com.infernokun.infernoctf.services;
 
-import com.infernokun.models.entities.User;
+import com.infernokun.infernoctf.models.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,7 +53,7 @@ public class TokenService {
     }
 
     @Bean
-    private void applicationJWT() {
+    private boolean applicationJWT() {
         Optional<List<User>> usersOpt = this.userService.findAllUsers();
 
         User admin = usersOpt
@@ -75,5 +74,6 @@ public class TokenService {
                 .build();
 
         LOGGER.info("TOKEN: {}", this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue());
+        return true;
     }
 }

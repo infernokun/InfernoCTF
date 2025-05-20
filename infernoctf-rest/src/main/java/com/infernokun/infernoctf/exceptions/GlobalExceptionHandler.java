@@ -1,4 +1,4 @@
-package com.infernokun.exceptions;
+package com.infernokun.infernoctf.exceptions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpHeaders;

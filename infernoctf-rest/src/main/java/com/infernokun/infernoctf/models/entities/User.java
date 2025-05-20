@@ -1,4 +1,4 @@
-package com.infernokun.models.entities;
+package com.infernokun.infernoctf.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.infernokun.models.auth.SimpleGrantedAuthority;
-import com.infernokun.models.enums.Role;
+import com.infernokun.infernoctf.models.auth.SimpleGrantedAuthority;
+import com.infernokun.infernoctf.models.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

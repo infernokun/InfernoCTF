@@ -1,7 +1,7 @@
-package com.infernokun.repositories;
+package com.infernokun.infernoctf.repositories;
 
-import com.infernokun.models.enums.Role;
-import com.infernokun.models.entities.User;
+import com.infernokun.infernoctf.models.enums.Role;
+import com.infernokun.infernoctf.models.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

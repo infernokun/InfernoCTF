@@ -1,7 +1,7 @@
-package com.infernokun.websocket;
+package com.infernokun.infernoctf.websocket;
 
-import com.infernokun.models.sessions.SessionDomain;
-import com.infernokun.models.sessions.SessionTracker;
+import com.infernokun.infernoctf.models.sessions.SessionDomain;
+import com.infernokun.infernoctf.models.sessions.SessionTracker;
 import org.jetbrains.annotations.NotNull;
 import org.jose4j.json.internal.json_simple.JSONObject;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
-package com.infernokun.services;
+package com.infernokun.infernoctf.services;
 
-import com.infernokun.models.entities.AnsweredCTFEntity;
-import com.infernokun.repositories.AnsweredCTFEntityRepository;
+import com.infernokun.infernoctf.models.entities.AnsweredCTFEntity;
+import com.infernokun.infernoctf.repositories.AnsweredCTFEntityRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

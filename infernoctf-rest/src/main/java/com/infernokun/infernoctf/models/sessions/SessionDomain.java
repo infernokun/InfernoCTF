@@ -1,4 +1,4 @@
-package com.infernokun.models.sessions;
+package com.infernokun.infernoctf.models.sessions;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,15 +1,13 @@
-package com.infernokun.components;
+package com.infernokun.infernoctf.components;
 
-import com.infernokun.config.InfernoCTFConfig;
-import com.infernokun.models.entities.User;
-import com.infernokun.models.enums.Role;
-import com.infernokun.services.UserService;
+import com.infernokun.infernoctf.config.InfernoCTFConfig;
+import com.infernokun.infernoctf.models.entities.User;
+import com.infernokun.infernoctf.models.enums.Role;
+import com.infernokun.infernoctf.services.UserService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class ApplicationInitializer implements ApplicationRunner {

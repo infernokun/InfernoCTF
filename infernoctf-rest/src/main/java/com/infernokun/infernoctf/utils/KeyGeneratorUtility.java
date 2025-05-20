@@ -1,4 +1,4 @@
-package com.infernokun.utils;
+package com.infernokun.infernoctf.utils;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;

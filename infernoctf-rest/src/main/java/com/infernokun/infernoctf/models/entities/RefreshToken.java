@@ -1,4 +1,4 @@
-package com.infernokun.models.entities;
+package com.infernokun.infernoctf.models.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,9 @@
-package com.infernokun.controllers;
+package com.infernokun.infernoctf.controllers;
 
-import com.infernokun.models.entities.CTFEntity;
-import com.infernokun.models.entities.Flag;
-import com.infernokun.services.CTFEntityService;
-import com.infernokun.services.FlagService;
+import com.infernokun.infernoctf.models.entities.CTFEntity;
+import com.infernokun.infernoctf.models.entities.Flag;
+import com.infernokun.infernoctf.services.CTFEntityService;
+import com.infernokun.infernoctf.services.FlagService;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
