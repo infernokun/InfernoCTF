@@ -32,8 +32,11 @@ export class AuthService {
 
     if (!token) {
       // No token found, return false immediately
+      console.log('token not found!!!');
       return of(false);
     }
+
+    console.log('token found!!!');
 
     const decodedToken = this.decodeToken(token);
     if (!decodedToken || !decodedToken.exp || decodedToken.exp * 1000 <= Date.now()) {
@@ -44,7 +47,7 @@ export class AuthService {
       );
     }
 
-    console.log('Token found and active');
+    console.log('Token found and active', decodedToken.sub);
 
     // Fetch user details from the server
     return this.userService.getUserById(decodedToken.sub).pipe(

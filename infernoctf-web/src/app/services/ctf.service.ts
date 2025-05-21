@@ -6,6 +6,7 @@ import { BehaviorSubject, EMPTY, Observable, switchMap } from 'rxjs';
 import { FlagAnswer } from '../models/flag-answer.model';
 import { AuthService } from './auth.service';
 import { BaseService } from './base.service';
+import { ApiResponse } from '../models/api-response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -21,22 +22,19 @@ export class CTFService extends BaseService {
     super(httpClient);
   }
 
-  getAllChallenges(): Observable<CTFEntity[]> {
-    //return this.httpClient.get<CTFEntity[]>(this.environmentService.settings?.restUrl + '/ctf-entity');
-    return this.get<CTFEntity[]>(this.environmentService.settings?.restUrl + '/ctf-entity');
+  getAllChallenges(): Observable<ApiResponse<CTFEntity[]>> {
+    return this.get<ApiResponse<CTFEntity[]>>(this.environmentService.settings?.restUrl + '/ctf-entity');
   }
 
-  getChallengesByRoom(roomId: string): Observable<CTFEntity[]> {
-    return this.get<CTFEntity[]>(this.environmentService.settings?.restUrl + '/ctf-entity/room/' + roomId);
+  getChallengesByRoom(roomId: string): Observable<ApiResponse<CTFEntity[]>> {
+    return this.get<ApiResponse<CTFEntity[]>>(this.environmentService.settings?.restUrl + '/ctf-entity/room/' + roomId);
   }
 
-  answerChallenge(flag: FlagAnswer): Observable<any> {
-    //return this.httpClient.post<FlagAnswer>(this.environmentService.settings?.restUrl + '/answer', flag);
-    return this.post<FlagAnswer>(this.environmentService.settings?.restUrl + '/answer', flag);
+  answerChallenge(flag: FlagAnswer): Observable<ApiResponse<any>> {
+    return this.post<ApiResponse<any>>(this.environmentService.settings?.restUrl + '/answer', flag);
   }
 
-  answerChallengeCheck(ctfEntity: CTFEntity): Observable<any> {
-    //return this.httpClient.post<FlagAnswer>(this.environmentService.settings?.restUrl + '/answer', flag);
-    return this.get<any>(this.environmentService.settings?.restUrl + `/answer/check?ctfEntityId=${ctfEntity.id}`);
+  answerChallengeCheck(ctfEntity: CTFEntity): Observable<ApiResponse<any>> {
+    return this.get<ApiResponse<any>>(this.environmentService.settings?.restUrl + `/answer/check?ctfEntityId=${ctfEntity.id}`);
   }
 }

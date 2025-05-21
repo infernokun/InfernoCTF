@@ -31,11 +31,11 @@ public class TokenService {
         this.userService = userService;
     }
 
-    public String generateJwt(UserDetails userDetails) {
+    public String generateJwt(User user) {
         Instant now = Instant.now();
-        Instant expiration = now.plusSeconds(60);
+        Instant expiration = now.plus(10, ChronoUnit.MINUTES); // Extended expiration time
 
-        String scope = userDetails.getAuthorities().stream()
+        String scope = user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
@@ -43,23 +43,22 @@ public class TokenService {
                 .issuer("self")
                 .issuedAt(now)
                 .expiresAt(expiration)
-                .subject(userDetails.getUsername())
+                .subject(user.getId())
                 .claim("roles", scope)
                 .build();
 
         String token = this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-        this.refreshTokenService.createRefreshToken(userDetails.getUsername(), token, expiration);
+        refreshTokenService.createRefreshToken(user.getUsername(), token, expiration);
         return token;
     }
 
     @Bean
     private boolean applicationJWT() {
-        Optional<List<User>> usersOpt = this.userService.findAllUsers();
+        List<User> users = this.userService.findAllUsers();
 
-        User admin = usersOpt
-                .flatMap(users -> users.stream()
+        User admin = users.stream()
                         .filter(user -> "admin".equals(user.getUsername()))
-                        .findFirst())
+                        .findFirst()
                 .orElse(new User("admin", "defaultPassword"));
 
         String scope = admin.getAuthorities().stream()

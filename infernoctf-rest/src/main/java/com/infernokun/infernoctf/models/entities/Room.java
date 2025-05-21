@@ -19,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 public class Room extends StoredObject {
     private String name;
-    private LocalDateTime createdAt = LocalDateTime.now();
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "creators")
     private User creator;

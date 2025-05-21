@@ -20,9 +20,8 @@ public class FlagService {
     private final AnsweredCTFEntityService answeredCTFEntityService;
     private final FlagRepository flagRepository;
 
-    private Logger LOGGER = LoggerFactory.getLogger(FlagService.class);
-
-    public FlagService(CTFEntityService ctfEntityService, UserService userService, AnsweredCTFEntityService answeredCTFEntityService, FlagRepository flagRepository) {
+    public FlagService(CTFEntityService ctfEntityService, UserService userService,
+                       AnsweredCTFEntityService answeredCTFEntityService, FlagRepository flagRepository) {
         this.ctfEntityService = ctfEntityService;
         this.userService = userService;
         this.answeredCTFEntityService = answeredCTFEntityService;
@@ -34,10 +33,7 @@ public class FlagService {
     }
 
     public boolean validateFlag(FlagAnswer flagAnswer) {
-        Optional<CTFEntity> ctfEntityOptional =  this.ctfEntityService.findCTFEntityById(flagAnswer.getQuestionId());
-        if (ctfEntityOptional.isEmpty()) { return false; }
-
-        CTFEntity ctfEntity = ctfEntityOptional.get();
+        CTFEntity ctfEntity =  this.ctfEntityService.findCTFEntityById(flagAnswer.getQuestionId());
 
         return ctfEntity.getFlags().stream().map(Flag::getFlag)
                 .anyMatch(flag -> flag.equals(flagAnswer.getFlag()));
@@ -45,19 +41,16 @@ public class FlagService {
 
     public Optional<AnsweredCTFEntity> addAnsweredCTFEntity(String username, FlagAnswer flagAnswer, boolean correct) {
         User user = this.userService.findUserByUsername(username);
-        Optional<CTFEntity> ctfEntityOptional =  this.ctfEntityService.findCTFEntityById(flagAnswer.getQuestionId());
-        if (ctfEntityOptional.isEmpty()) { return Optional.empty(); }
+        CTFEntity ctfEntity =  this.ctfEntityService.findCTFEntityById(flagAnswer.getQuestionId());
 
-
-        Optional<AnsweredCTFEntity> answeredCTFEntityOptional = this.
-                answeredCTFEntityService.
-                findByUserIdAndCtfEntityId(user.getId(), ctfEntityOptional.get().getId());
+        Optional<AnsweredCTFEntity> answeredCTFEntityOptional = answeredCTFEntityService
+                .findByUserIdAndCtfEntityId(user.getId(), ctfEntity.getId());
 
         AnsweredCTFEntity answeredCTFEntity = answeredCTFEntityOptional.orElseGet(
                 () -> AnsweredCTFEntity
                         .builder()
                         .user(user)
-                        .ctfEntity(ctfEntityOptional.get())
+                        .ctfEntity(ctfEntity)
                         .correct(correct)
                         .answers(new ArrayList<>())
                         .times(new ArrayList<>())

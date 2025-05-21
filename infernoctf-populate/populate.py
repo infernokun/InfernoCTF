@@ -2,7 +2,7 @@ from enum import Flag
 import requests
 from datetime import datetime, timedelta
 
-url = "https://127.0.0.1:8080/infernoctf-rest"
+url = "http://127.0.0.1:8081/infernoctf-rest/api"
 admin_user = "infernoctf_admin"
 
 def get_admin_user():

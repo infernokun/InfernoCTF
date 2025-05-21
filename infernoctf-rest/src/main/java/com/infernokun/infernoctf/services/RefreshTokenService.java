@@ -5,8 +5,6 @@ import com.infernokun.infernoctf.models.entities.RefreshToken;
 import com.infernokun.infernoctf.models.entities.User;
 import com.infernokun.infernoctf.repositories.RefreshTokenRepository;
 import com.infernokun.infernoctf.repositories.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +17,6 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(RefreshTokenService.class);
     public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
@@ -77,7 +74,6 @@ public class RefreshTokenService {
     public Optional<RefreshToken> deleteToken(String id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
-            LOGGER.info("LOGOUT COMPLETE");
             return refreshTokenRepository.deleteByUserId(id);
         } else {
             return Optional.empty();

@@ -6,6 +6,7 @@ import com.infernokun.infernoctf.models.entities.User;
 import com.infernokun.infernoctf.services.AnsweredCTFEntityService;
 import com.infernokun.infernoctf.services.FlagService;
 import com.infernokun.infernoctf.services.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/answer")
-@CrossOrigin
 public class FlagAnswerController {
     private final FlagService flagService;
     private final AnsweredCTFEntityService answeredCTFEntityService;

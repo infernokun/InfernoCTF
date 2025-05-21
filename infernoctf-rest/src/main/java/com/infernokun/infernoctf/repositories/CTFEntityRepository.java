@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface CTFEntityRepository extends JpaRepository<CTFEntity, String> {
-    Optional<List<CTFEntity>> findByRoomId(String roomId);
+    List<CTFEntity> findByRoomId(String roomId);
 }

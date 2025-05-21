@@ -1,68 +1,100 @@
-<header class="header-footer {{ bannerDisplayStyle }}">
-  <b>{{ header }}</b>
-</header>
-<mat-toolbar class="main-toolbar">
-  <div class="display-flex flex-row">
-    <article class="margin-left-half flex-fill display-flex">
-      <div class="image-box interactive-text" routerLink="/">
-        <svg width="45" height="45" xmlns="http://www.w3.org/2000/svg">
-          <image xlink:href="assets/icon.svg" width="45" height="45" x="0" y="0" />
-        </svg>
-      </div>
-      <div class="display-flex flex-column justify-content-start">
-        <div class="display-flex flex-row align-items-baseline">
-          <span class="text-3x interactive-text" routerLink="/">{{ title }}&nbsp;</span>
-          <span class="text-sm" style="line-height: 16px">v{{ appVersion }}</span>
+<div class="main-body">
+  <header class="header-footer {{ bannerDisplayStyle }}">
+    <b>{{ header }}</b>
+  </header>
+  <mat-toolbar class="main-toolbar">
+    <div class="display-flex flex-row">
+      <article class="margin-left-half flex-fill display-flex">
+        <div class="image-box interactive-text" routerLink="/">
+          <svg width="45" height="45" xmlns="http://www.w3.org/2000/svg">
+            <image xlink:href="assets/icon.svg" width="45" height="45" x="0" y="0" />
+          </svg>
         </div>
-        <div class="text-sm" style="line-height: 16px">
-          A tool by
-          <a href="">Me..</a>
+        <div class="display-flex flex-column justify-content-start tool-info">
+          <div class="display-flex flex-row align-items-baseline">
+            <span class="text-2x interactive-text" routerLink="/">{{ title }}&nbsp;</span>
+            <span class="text-sm" style="line-height: 16px">v{{ appVersion }}</span>
+          </div>
+          <div class="text-sm" style="line-height: 16px">
+            A tool by
+            <a href="https://github.com/infernokun">InfernoKun..</a>
+          </div>
         </div>
-      </div>
-    </article>
-  </div>
-  <div>
-    <article>
-      <div>
-        <a routerLink="/">Home</a>
-        <a routerLink="/home">Challenges</a>
-      </div>
-    </article>
-  </div>
-  <div class="display-flex flex-row width-100-percent justify-content-end">
-    <article class="margin-right-2x display-flex flex-column justify-content-center">
-      <div *ngIf="(loggedInUser$ | async) as payload else login">
-        <div>{{ payload.username }} | {{ payload.role }}</div>
-      </div>
-    </article>
-    <button class="menuButton" mat-icon-button [matMenuTriggerFor]="theMenu">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <mat-menu #theMenu="matMenu">
-      <div *ngIf="loggedInUser$ | async" class="toolbar-menu-options-wrapper">
-        <button mat-menu-item>Profile</button>
-        <button mat-menu-item (click)="logoutButton()">Logout</button>
-      </div>
-    </mat-menu>
-  </div>
-</mat-toolbar>
-<div class="main-content" id="router-container">
-  <router-outlet></router-outlet>
-</div>
-<footer class="header-footer {{ bannerDisplayStyle }}">
-  <b>{{ footer }}</b>
-</footer>
+      </article>
+    </div>
+    <!-- Navigation Links - Inline -->
+    <nav class="nav-links">
 
-<ng-template #loading>
-  <div class="spinner-border" role="status">
-    <span class="visually-hidden">Loading...</span>
-    <mat-spinner></mat-spinner>
+      <a routerLink="/" class="nav-link">Home</a>
+      <a routerLink="/challenges" class="nav-link">Challenges</a>
+
+    </nav>
+    <div class="display-flex flex-row width-100-percent justify-content-end">
+      <article class="user-info">
+        <div *ngIf="(loggedInUser$ | async) as user; else login" class="user-details">
+          <span class="user-name">{{ user?.username }}</span>
+          <span class="role-name">[{{ user?.role }}]</span>
+        </div>
+      </article>
+      <button class="menuButton" mat-icon-button [matMenuTriggerFor]="theMenu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <mat-menu #theMenu="matMenu" class="user-actions-menu">
+        <ng-container *ngIf="(loggedInUser$ | async) as user; else guestMenu">
+          <!-- Logged-in user menu items -->
+          <div class="user-menu-header">
+            <span class="user-menu-name">{{ user.username }}</span>
+            <span class="user-menu-role">{{ user.role }}</span>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="openProfileModal()" aria-label="View profile">
+            <mat-icon>account_circle</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item (click)="openUserSettingsModal()" aria-label="User settings">
+            <mat-icon>settings</mat-icon>
+            <span>Settings</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logoutButton()" aria-label="Log out">
+            <mat-icon>exit_to_app</mat-icon>
+            <span>Logout</span>
+          </button>
+        </ng-container>
+      </mat-menu>
+      
+      <!-- Guest user menu template -->
+      <ng-template #guestMenu>
+        <button mat-menu-item (click)="openLoginModal()" aria-label="Log in">
+          <mat-icon>login</mat-icon>
+          <span>Login</span>
+        </button>
+        <button mat-menu-item (click)="openRegisterModal()" aria-label="Register a new account">
+          <mat-icon>person_add</mat-icon>
+          <span>Register</span>
+        </button>
+      </ng-template>
+    </div>
+  </mat-toolbar>
+  <div class="main-content" id="router-container">
+    <router-outlet></router-outlet>
+  </div>
+  <footer class="header-footer {{ bannerDisplayStyle }}">
+    <b>{{ footer }}</b>
+  </footer>
+</div>
+
+<ng-template #login>
+  <div *ngIf="!(loadingUser$ | async) else loading" style="display: flex;">
+    <button class="user-button" mat-button
+      (click)="openLoginModal()">Login</button>
+    <button class="user-button" mat-button
+      (click)="openRegisterModal()">Register</button>
   </div>
 </ng-template>
 
-<ng-template #login>
-  <div *ngIf="!(loading$ | async) else loading" style="display: flex;">
-    <button class="user-button" mat-button (click)="openLoginModal()">Login</button>
-    <button class="user-button" mat-button (click)="openRegisterModal()">Register</button>
+<ng-template #loading>
+  <div class="loading-container">
+    <span class="visually-hidden">Loading application content...</span>
   </div>
 </ng-template>

@@ -1,5 +1,6 @@
 package com.infernokun.infernoctf.services;
 
+import com.infernokun.infernoctf.exceptions.ResourceNotFoundException;
 import com.infernokun.infernoctf.models.entities.CTFEntity;
 import com.infernokun.infernoctf.models.entities.Flag;
 import com.infernokun.infernoctf.repositories.CTFEntityRepository;
@@ -19,31 +20,37 @@ public class CTFEntityService {
         this.flagRepository = flagRepository;
     }
 
-    public Optional<CTFEntity> saveCTFEntity(CTFEntity ctfEntity) {
-        return Optional.of(this.ctfEntityRepository.save(ctfEntity));
+    public CTFEntity saveCTFEntity(CTFEntity ctfEntity) {
+        return ctfEntityRepository.save(ctfEntity);
     }
 
     public Optional<List<Flag>> saveFlags(List<Flag> flags) {
-        return Optional.of(this.flagRepository.saveAll(flags));
+        return Optional.of(flagRepository.saveAll(flags));
     }
 
-    public Optional<List<CTFEntity>> findAllCTFEntities() {
-        return Optional.of(this.ctfEntityRepository.findAll());
+    public List<CTFEntity> findAllCTFEntities() {
+        return ctfEntityRepository.findAll();
     }
 
-    public Optional<CTFEntity> findCTFEntityById(String id) {
-        return this.ctfEntityRepository.findById((id));
+    public CTFEntity findCTFEntityById(String id) {
+        return ctfEntityRepository.findById((id)).orElseThrow(() -> new ResourceNotFoundException("No entity by id " + id + " found!"));
     }
 
-    public void deleteCTFEntity(String id) {
-        this.ctfEntityRepository.deleteById(id);
+
+    public boolean deleteCTFEntity(String id) {
+        if (!ctfEntityRepository.existsById(id)) {
+            return false;
+        }
+
+        ctfEntityRepository.deleteById(id);
+        return true;
     }
 
     public Optional<List<CTFEntity>> savaAll(List<CTFEntity> ctfEntities) {
-        return Optional.of(this.ctfEntityRepository.saveAll(ctfEntities));
+        return Optional.of(ctfEntityRepository.saveAll(ctfEntities));
     }
 
-    public Optional<List<CTFEntity>> findCTFEntityByRoomId(String roomId) {
-        return this.ctfEntityRepository.findByRoomId(roomId);
+    public List<CTFEntity> findCTFEntitiesByRoomId(String roomId) {
+        return ctfEntityRepository.findByRoomId(roomId);
     }
 }

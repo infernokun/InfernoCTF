@@ -1,5 +1,6 @@
 package com.infernokun.infernoctf.controllers;
 
+import com.infernokun.infernoctf.models.ApiResponse;
 import com.infernokun.infernoctf.models.entities.CTFEntity;
 import com.infernokun.infernoctf.models.entities.Flag;
 import com.infernokun.infernoctf.services.CTFEntityService;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +19,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping("/api/ctf-entity")
 public class CTFEntityController {
-    private final Logger LOGGER =  LoggerFactory.getLogger(CTFEntityController.class);
     private final CTFEntityService ctfEntityService;
     private final FlagService flagService;
 
@@ -34,40 +34,43 @@ public class CTFEntityController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CTFEntity>> getAllCTFEntities() {
-        Optional<List<CTFEntity>> ctfEntities = ctfEntityService.findAllCTFEntities();
-        return ctfEntities.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<List<CTFEntity>>> getAllCTFEntities() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<List<CTFEntity>>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("All entities obtained!")
+                        .data(ctfEntityService.findAllCTFEntities())
+                        .build());
     }
 
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<List<CTFEntity>> getByRoomId(@PathVariable String roomId) {
-        Optional<List<CTFEntity>> ctfEntities = this.ctfEntityService.findCTFEntityByRoomId(roomId);
-        return ctfEntities.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<List<CTFEntity>>> getByRoomId(@PathVariable String roomId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<List<CTFEntity>>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Obtained room by id!")
+                        .data(ctfEntityService.findCTFEntitiesByRoomId(roomId))
+                        .build());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CTFEntity> getCTFEntityById(@PathVariable String id) {
-        Optional<CTFEntity> ctfEntity = ctfEntityService.findCTFEntityById(id);
-        return ctfEntity.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<CTFEntity>> getCTFEntityById(@PathVariable String id) {
+        CTFEntity ctfEntity = ctfEntityService.findCTFEntityById(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<CTFEntity>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Obtained CTFEntity by id!")
+                        .data(ctfEntity)
+                        .build());
     }
 
     @PostMapping
-    public ResponseEntity<CTFEntity> createCTFEntity(@RequestBody CTFEntity ctfEntity) {
+    public ResponseEntity<ApiResponse<CTFEntity>> createCTFEntity(@RequestBody CTFEntity ctfEntity) {
         // Save the CTFEntity first to generate an ID
-        Optional<CTFEntity> savedCTFEntityOptional = ctfEntityService.saveCTFEntity(ctfEntity);
-
-        // If the CTFEntity wasn't saved successfully, return not found
-        if (savedCTFEntityOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        CTFEntity savedCTFEntity = savedCTFEntityOptional.get();
+        CTFEntity savedCTFEntity = ctfEntityService.saveCTFEntity(ctfEntity);
 
         // Set the saved CTFEntity in the flags and save them
         for (Flag flag : savedCTFEntity.getFlags()) {
-            if (flag.getId() == null) {
-                flag.setId(UUID.randomUUID().toString());
-            }
             // Set the CTFEntity reference
             flag.setCtfEntity(savedCTFEntity);
 
@@ -76,7 +79,12 @@ public class CTFEntityController {
         }
 
         // Return the saved CTFEntity in the response
-        return ResponseEntity.ok(savedCTFEntity);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<CTFEntity>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Created new CTFEntity!")
+                        .data(savedCTFEntity)
+                        .build());
     }
 
 
@@ -97,19 +105,24 @@ public class CTFEntityController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CTFEntity> updateCTFEntity(@PathVariable UUID id, @RequestBody CTFEntity ctfEntity) {
-        Optional<CTFEntity> updatedEntity = ctfEntityService.saveCTFEntity(ctfEntity);
-        return updatedEntity.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<CTFEntity>> updateCTFEntity(@PathVariable String id) {
+        CTFEntity ctfEntity = ctfEntityService.findCTFEntityById(id);
+        CTFEntity updatedEntity = ctfEntityService.saveCTFEntity(ctfEntity);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<CTFEntity>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Updated the entity")
+                        .data(updatedEntity)
+                        .build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCTFEntity(@PathVariable String id) {
-        Optional<CTFEntity> entityOptional = ctfEntityService.findCTFEntityById(id);
-        if (entityOptional.isPresent()) {
-            ctfEntityService.deleteCTFEntity(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ApiResponse<Boolean>> deleteCTFEntity(@PathVariable String id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<Boolean>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Entity item deleted successfully.")
+                        .data(ctfEntityService.deleteCTFEntity(id))
+                        .build());
     }
 }

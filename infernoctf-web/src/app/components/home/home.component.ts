@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, Subject, finalize, takeUntil } from 'rxjs'
 import { Room, RoomFormData } from '../../models/room.model';
 import { CommonEditDialogService } from '../../services/common-edit-dialog.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ApiResponse } from '../../models/api-response.model';
 
 @Component({
   selector: 'app-home',
@@ -13,16 +14,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  private roomsSubject = new BehaviorSubject<Room[]>([]);
   
-  rooms$: Observable<Room[]> = this.roomsSubject.asObservable();
+  rooms$: Observable<Room[] | undefined>;
   isLoading = false;
 
   constructor(
     private roomService: RoomService,
     private commonEditDialogService: CommonEditDialogService,
     private snackBar: MatSnackBar
-  ) {}
+  ) {
+    this.rooms$ = this.roomService.rooms$;
+  }
 
   ngOnInit(): void {
     this.loadRooms();
@@ -41,8 +43,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         finalize(() => this.isLoading = false)
       )
       .subscribe({
-        next: (rooms) => {
-          this.roomsSubject.next(rooms);
+        next: (response: ApiResponse<Room[]>) => {
+          this.roomService.addRooms(response.data);
         },
         error: (error) => {
           console.error('Failed to load rooms', error);
@@ -50,6 +52,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
       });
   }
+
 
   createRoom(): void {
     try {
@@ -68,21 +71,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!room) return;
     
     this.isLoading = true;
-    /*this.roomService.createRoom(room)
+    this.roomService.createRoom(room)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.isLoading = false)
       )
       .subscribe({
-        next: (createdRoom) => {
-          this.showSuccess(`Room "${createdRoom.name}" successfully created`);
-          this.loadRooms();
+        next: (response: ApiResponse<Room>) => {
+          if (!response.data) {
+            return;
+          }
+
+          this.showSuccess(`Room "${response.data.name}" successfully created`);
+          this.roomService.addNewRoom(new Room(response.data))
         },
         error: (error) => {
           console.error('Failed to create room', error);
           this.showError('Failed to create room. Please try again.');
         }
-      });*/
+      });
   }
 
   private showSuccess(message: string): void {

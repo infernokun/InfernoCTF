@@ -17,6 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -65,9 +66,13 @@ public class AuthenticationService {
                     new UsernamePasswordAuthenticationToken(username, password)
             );
 
-            User user = (User) auth.getPrincipal();
+            User loggedInUser = userService.findUserByUsername(username);
+            loggedInUser.setLastLogin(LocalDateTime.now());
+            userService.updateUser(loggedInUser);
 
+            User user = (User) auth.getPrincipal();
             String token = tokenService.generateJwt(user);
+
             return new LoginResponseDTO(token, user);
         } catch (BadCredentialsException e) {
             throw new WrongPasswordException("Invalid username or password");

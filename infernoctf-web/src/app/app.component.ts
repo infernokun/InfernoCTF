@@ -41,6 +41,9 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
+    this.loggedInUser$ = this.authService.user$;
+    this.loadingUser$ = this.authService.loading$;
+
     this.checkAuthentication();
   }
 
@@ -68,4 +71,8 @@ export class AppComponent {
   logoutButton(): void {
     this.authService.logout();
   }
+
+  openProfileModal() { }
+
+  openUserSettingsModal() { }
 }

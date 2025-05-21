@@ -1,5 +1,17 @@
+.main-body {
+  margin: 0 auto;
+  display: grid;
+  width: 100%;
+  min-height: 100vh;
+  grid-template-rows: auto auto 1fr auto;
+  overflow-x: hidden;
+}
+
 .main-content {
   margin: 0 auto;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .image-box {
@@ -31,6 +43,14 @@
   margin-top: auto;
   margin-bottom: auto;
 }
+.main-toolbar {
+  background-color: #222222;
+  min-height: 5rem;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
 
 .user-button {
   background-color: #007bff;
@@ -46,4 +66,116 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-right: 10px
+}
+
+.tool-info {
+  color: #8d1614
+}
+
+.nav-links {
+  margin-left: 1rem;
+  display: inline-block;
+  gap: 20px; // spacing between links
+  flex-wrap: wrap; // in case of smaller screens
+
+  .nav-link {
+    font-size: 1rem;
+    text-decoration: none;
+    color: #e53935;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.remote-server-select {
+  position: relative;
+  top: 0.7rem;
+  width: 100%;
+  margin-right: 5rem;
+
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  background: #303030;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 0.95rem;
+  font-weight: 500;
+  height: 50%; 
+  margin: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+
+  .user-details {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #333;
+
+    .user-name {
+      color: #007bff;
+      font-weight: 600;
+    }
+
+    .team-name {
+      color: #c58634;
+      font-weight: 500;
+    }
+
+    .role-name {
+      color: #28a745;
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: #e53935;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation for content appearing */
+.main-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

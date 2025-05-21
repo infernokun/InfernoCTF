@@ -5,6 +5,7 @@ import { DialogService } from '../../../services/dialog.service';
 import { WebsocketService } from '../../../services/websocket.service';
 import { AuthService } from '../../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ApiResponse } from '../../../models/api-response.model';
 
 @Component({
   selector: 'app-ctf-card',
@@ -30,13 +31,13 @@ export class CTFCardComponent {
       if (params['room']) {
         console.log('params', params);
 
-        this.ctfService.getChallengesByRoom(params['room']).subscribe((ctfEntities: CTFEntity[]) => {
-          if (ctfEntities) {
-            this.challenges = ctfEntities;
+        this.ctfService.getChallengesByRoom(params['room']).subscribe((response: ApiResponse<CTFEntity[]>) => {
+          if (response.data) {
+            this.challenges = response.data;
             this.busy = false;
             this.ctfService.loadingSubject.next(false);
 
-            console.log('ctfEntities', ctfEntities);
+            console.log('ctfEntities', response);
           }
         });
       }
@@ -44,9 +45,9 @@ export class CTFCardComponent {
 
     this.authService.loading$.subscribe((loading) => {
       if (!loading) {
-        this.ctfService.getAllChallenges().subscribe((ctfEntities: CTFEntity[]) => {
-          if (ctfEntities) {
-            this.challenges = ctfEntities;
+        this.ctfService.getAllChallenges().subscribe((response: ApiResponse<CTFEntity[]>) => {
+          if (response.data) {
+            this.challenges = response.data;
             this.ctfService.loadingSubject.next(false);
           }
         });

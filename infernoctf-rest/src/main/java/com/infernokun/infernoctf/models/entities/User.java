@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.infernokun.infernoctf.interfaces.JsonDate;
 import com.infernokun.infernoctf.models.auth.SimpleGrantedAuthority;
 import com.infernokun.infernoctf.models.enums.Role;
 import jakarta.persistence.*;
@@ -20,6 +21,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
@@ -32,6 +34,8 @@ public class User extends StoredObject implements UserDetails {
     private String email;
     @Enumerated(EnumType.STRING)
     private Role role = Role.MEMBER;
+    @JsonDate
+    private LocalDateTime lastLogin;
 
     public User(String username, String password) {
         this.username = username;

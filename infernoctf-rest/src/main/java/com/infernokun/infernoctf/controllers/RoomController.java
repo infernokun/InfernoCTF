@@ -1,15 +1,18 @@
 package com.infernokun.infernoctf.controllers;
 
+import com.infernokun.infernoctf.models.ApiResponse;
+import com.infernokun.infernoctf.models.entities.CTFEntity;
 import com.infernokun.infernoctf.models.entities.Room;
 import com.infernokun.infernoctf.services.RoomService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
-@CrossOrigin
 @RequestMapping("/api/room")
 public class RoomController {
     private final RoomService roomService;
@@ -36,8 +39,13 @@ public class RoomController {
     }
 
     @PostMapping
-    public ResponseEntity<Room> createRoom(@RequestBody Room room) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.roomService.saveRoom(room));
+    public ResponseEntity<ApiResponse<Room>> createRoom(@RequestBody Room room) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<Room>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Lab stopped successfully.")
+                        .data(this.roomService.saveRoom(room))
+                        .build());
     }
 
     @PostMapping("many")

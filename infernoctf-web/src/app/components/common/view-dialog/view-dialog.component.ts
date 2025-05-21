@@ -5,6 +5,7 @@ import { CTFService } from '../../../services/ctf.service';
 import { FlagAnswer } from '../../../models/flag-answer.model';
 import { AuthService, UserPayload } from '../../../services/auth.service';
 import { BehaviorSubject, Observable, take } from 'rxjs';
+import { ApiResponse } from '../../../models/api-response.model';
 
 @Component({
   selector: 'app-view-dialog',
@@ -30,18 +31,18 @@ export class ViewDialogComponent {
   ngOnInit(): void {
     console.log("opened dialog");
 
-    this.ctfService.answerChallengeCheck(this.viewedChallenge).subscribe((res) => {
-      if (res) {
-        console.log('is answered', res);
-        if (res.correct === true) {
+    this.ctfService.answerChallengeCheck(this.viewedChallenge).subscribe((response: ApiResponse<any>) => {
+      if (response.data) {
+        console.log('is answered', response);
+        if (response.data.correct === true) {
           this.isAnswered.next(true);
 
-          const ans: any[] = res.answers;
+          const ans: any[] = response.data.answers;
           this.answer = ans[ans.length - 1];
           return;
         }
 
-        if (res.attempts == this.viewedChallenge.maxAttempts) {
+        if (response.data.attempts == this.viewedChallenge.maxAttempts) {
           this.isAnswered.next(true);
           return;
         }
@@ -59,21 +60,21 @@ export class ViewDialogComponent {
         return;
       }
       const flag: FlagAnswer = new FlagAnswer(this.answer, payload.user.username!, challenge.id!);
-      this.ctfService.answerChallenge(flag).subscribe((res) => {
-        if (res) {
-          if (res.correct === true) {
+      this.ctfService.answerChallenge(flag).subscribe((response: ApiResponse<any>) => {
+        if (response.data) {
+          if (response.data.correct === true) {
             this.isAnswered.next(true);
             console.log('correct!!!');
             return;
           }
 
-          if (res.attempts == this.viewedChallenge.maxAttempts) {
+          if (response.data.attempts == this.viewedChallenge.maxAttempts) {
             this.isAnswered.next(true);
             console.log('max attempts reached');
             return;
           }
-          this.isAnswered.next(res.correct);
-          console.log('answer response', res);
+          this.isAnswered.next(response.data.correct);
+          console.log('answer response', response);
         }
       });
     });

@@ -7,7 +7,7 @@ import { authGuard } from './guards/auth.guard';
 import { UserComponent } from './components/user/user.component';
 
 const routes: Routes = [
-  { path: 'home', component: CTFMainComponent, canActivate: [authGuard] },
+  { path: 'challenges', component: CTFMainComponent, canActivate: [authGuard] },
   { path: 'room/:room', component: CTFMainComponent, canActivate: [authGuard] },
   { path: 'admin/users', component: UserComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
