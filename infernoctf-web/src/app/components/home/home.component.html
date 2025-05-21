@@ -1,11 +1,30 @@
-<div>
-  <h1 class="width-100-percent text-center margin-1x">
-    Homepage
-  </h1>
-  <button mat-button (click)="createRoom()" mat-success color="success">Create Room</button>
-  <ol *ngFor="let room of rooms$ | async">
-    <li>
-      <a [routerLink]="['/room/' + room.id]">{{ room.name }}</a>
-    </li>
-  </ol>
+<div class="container">
+  <h1 class="text-center my-4">Room Management</h1>
+  <div class="action-bar mb-3">
+    <button mat-raised-button color="primary" (click)="createRoom()">
+      <mat-icon>add</mat-icon> Create Room
+    </button>
+  </div>
+  
+  <ng-container *ngIf="(rooms$ | async) as rooms">
+    <div *ngIf="rooms.length; else noRooms" class="room-list">
+      <div class="room-items">
+        <div *ngFor="let room of rooms" class="room-item">
+          <a [routerLink]="['/room', room.id]" class="room-link">
+            {{ room.name }}
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <ng-template #noRooms>
+      <div class="no-rooms-message">
+        <p>No rooms available. Create a new room to get started.</p>
+      </div>
+    </ng-template>
+  </ng-container>
+  
+  <div *ngIf="isLoading" class="loading-indicator">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
 </div>

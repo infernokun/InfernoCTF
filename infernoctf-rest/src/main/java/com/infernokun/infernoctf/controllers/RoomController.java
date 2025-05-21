@@ -19,13 +19,20 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<Room> getRoomByName(@RequestParam("name") String roomName) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.roomService.findByRoomName(roomName));
-    }
-
-    @GetMapping("all")
     public ResponseEntity<List<Room>> getAllRooms() {
         return ResponseEntity.status(HttpStatus.OK).body(this.roomService.findAllRooms());
+    }
+
+    @GetMapping("/byName")
+    public ResponseEntity<Room> getRoomByName(@RequestParam("name") String roomName) {
+        if (roomName == null || roomName.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        Room room = this.roomService.findByRoomName(roomName);
+        if (room == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(room);
     }
 
     @PostMapping

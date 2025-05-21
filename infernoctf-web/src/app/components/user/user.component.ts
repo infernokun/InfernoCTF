@@ -3,17 +3,19 @@ import { User } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { Role } from '../../models/enums/role.enum';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
-  styleUrl: './user.component.scss'
+  styleUrl: './user.component.scss',
+  standalone: false
 })
 export class UserComponent {
   public users: User[] = [];
   public busy = false;
 
-  loading$ = this.userService.loading$;
+  loading$ = of(false);
 
   roles = Object.values(Role);
 
@@ -28,7 +30,7 @@ export class UserComponent {
           if (users) {
             this.users = users;
             this.busy = false;
-            this.userService.loadingSubject.next(false);
+            //this.userService.loadingSubject.next(false);
             console.log('users', users);
           }
         });

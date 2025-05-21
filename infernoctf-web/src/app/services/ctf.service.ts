@@ -16,10 +16,9 @@ export class CTFService extends BaseService {
 
   constructor(
     protected httpClient: HttpClient,
-    private environmentService: EnvironmentService,
-    protected override authService: AuthService
+    private environmentService: EnvironmentService
   ) { 
-    super(httpClient, authService);
+    super(httpClient);
   }
 
   getAllChallenges(): Observable<CTFEntity[]> {

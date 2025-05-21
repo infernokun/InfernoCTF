@@ -11,12 +11,11 @@ export class RoomService extends BaseService {
 
   constructor(
     private httpClient: HttpClient,
-    private environmentService: EnvironmentService,
-    protected override authService: AuthService) {
-    super(httpClient, authService);
+    private environmentService: EnvironmentService) {
+    super(httpClient);
   }
 
-  getRooms() {
+  getAllRooms() {
     return this.get<any>(this.environmentService.settings?.restUrl + '/room');
   }
 

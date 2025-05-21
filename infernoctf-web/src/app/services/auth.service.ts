@@ -146,7 +146,6 @@ export class AuthService {
     );
   }
 
-
   private checkTokenValidity(token: string, payload: UserPayload): Observable<boolean> {
     return this.loginService.checkToken(token).pipe(
       switchMap(answer => {

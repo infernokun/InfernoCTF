@@ -9,7 +9,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 @Component({
   selector: 'app-ctf-card',
   templateUrl: './ctf-card.component.html',
-  styleUrl: './ctf-card.component.scss'
+  styleUrl: './ctf-card.component.scss',
+  standalone: false
 })
 export class CTFCardComponent {
   public challenges: CTFEntity[] = [];

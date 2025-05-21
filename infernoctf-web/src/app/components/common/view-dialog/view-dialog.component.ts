@@ -9,7 +9,8 @@ import { BehaviorSubject, Observable, take } from 'rxjs';
 @Component({
   selector: 'app-view-dialog',
   templateUrl: './view-dialog.component.html',
-  styleUrl: './view-dialog.component.scss'
+  styleUrl: './view-dialog.component.scss',
+  standalone: false
 })
 export class ViewDialogComponent {
   viewedChallenge!: CTFEntity;

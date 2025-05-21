@@ -17,6 +17,7 @@ import { MessageService } from '../../../services/message.service';
   selector: 'app-generic-add-object-dialog-form',
   templateUrl: './generic-add-object-dialog-form.component.html',
   styleUrls: ['./generic-add-object-dialog-form.component.scss'],
+  standalone: false
 })
 export class GenericAddObjectDialogFormComponent implements OnInit, AfterViewInit {
   // @Input() d!: SimpleFormData;

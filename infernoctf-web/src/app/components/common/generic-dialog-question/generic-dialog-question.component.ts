@@ -14,6 +14,7 @@ import { RoomFormData } from '../../../models/room.model';
   selector: 'app-generic-dialog-question',
   templateUrl: './generic-dialog-question.component.html',
   styleUrls: ['./generic-dialog-question.component.scss'],
+  standalone: false
 })
 export class GenericDialogQuestionComponent implements OnInit {
   @Input() question!: QuestionBase;

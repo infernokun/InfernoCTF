@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { EnvironmentService } from './environment.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { User } from '../models/user.model';
-import { BaseService } from './base.service';
-import { AuthService } from './auth.service';
 import { ApiResponse } from '../models/api-response.model';
+import { EnvironmentService } from './environment.service';
+import { BaseService } from './base.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,14 +13,11 @@ export class UserService extends BaseService {
   private usersSubject = new BehaviorSubject<User[]>([]);
   private loggedInUserSubject = new BehaviorSubject<User | undefined>(undefined);
   loggedInUser$: Observable<User | undefined> = this.loggedInUserSubject.asObservable();
-  public loadingSubject = new BehaviorSubject<boolean>(true);
-  loading$ = this.loadingSubject.asObservable();
 
   constructor(
-    private environmentService: EnvironmentService,
     protected httpClient: HttpClient,
-    protected override authService: AuthService) {
-    super(httpClient, authService);
+    private environmentService: EnvironmentService) {
+    super(httpClient);
   }
 
   get users$(): Observable<User[]> {

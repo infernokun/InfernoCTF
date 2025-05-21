@@ -4,7 +4,8 @@ import { AuthService } from '../../../services/auth.service';
 @Component({
   selector: 'app-ctf-main',
   templateUrl: './ctf-main.component.html',
-  styleUrl: './ctf-main.component.scss'
+  styleUrl: './ctf-main.component.scss',
+  standalone: false
 })
 export class CTFMainComponent {
   authenticated: boolean = false;
