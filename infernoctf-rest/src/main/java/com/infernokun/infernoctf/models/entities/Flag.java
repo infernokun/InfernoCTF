@@ -18,5 +18,6 @@ public class Flag extends StoredObject {
     private Double weight;
     @ManyToOne
     @JoinColumn(name = "ctf_entity_id")
+    @JsonBackReference
     private CTFEntity ctfEntity;
 }

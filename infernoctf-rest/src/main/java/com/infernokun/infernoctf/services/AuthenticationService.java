@@ -70,10 +70,9 @@ public class AuthenticationService {
             loggedInUser.setLastLogin(LocalDateTime.now());
             userService.updateUser(loggedInUser);
 
-            User user = (User) auth.getPrincipal();
-            String token = tokenService.generateJwt(user);
+            String token = tokenService.generateJwt(loggedInUser);
 
-            return new LoginResponseDTO(token, user);
+            return new LoginResponseDTO(token, loggedInUser);
         } catch (BadCredentialsException e) {
             throw new WrongPasswordException("Invalid username or password");
         } catch (AuthenticationException e) {

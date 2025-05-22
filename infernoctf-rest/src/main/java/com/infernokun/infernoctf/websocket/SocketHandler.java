@@ -3,7 +3,6 @@ package com.infernokun.infernoctf.websocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.infernokun.infernoctf.interfaces.JsonDate;
 import com.infernokun.infernoctf.models.entities.StoredObject;
 import lombok.Builder;
 import lombok.Data;
@@ -83,7 +82,6 @@ public class SocketHandler extends TextWebSocketHandler {
     @Builder
     private static class HeartbeatDTO {
         private String type;
-        @JsonDate
         private LocalDateTime timestamp;
         private String session;
     }

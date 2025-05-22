@@ -2,10 +2,10 @@ import { SimpleFormData, TextQuestion } from "./SimpleFormData.model";
 import { StoredObject } from "./stored-object.model";
 
 export class Room extends StoredObject {
-  name: string = '';
-  creator: string = '';
-  facilitators: string[] = [];
-  surroundTag: string = '';
+  name?: string = '';
+  creator?: string = '';
+  facilitators?: string[] = [];
+  surroundTag?: string = '';
 
   constructor(serverResult?: any) {
     super(serverResult);

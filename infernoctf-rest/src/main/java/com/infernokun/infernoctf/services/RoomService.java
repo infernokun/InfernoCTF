@@ -20,13 +20,21 @@ public class RoomService {
                 .orElseThrow(() -> new RoomNotFoundException("Room with name '" + roomName + "' not found."));
     }
 
+    public Room findByRoomId(String id) {
+        return roomRepository.findById(id).orElseThrow(
+                () -> new RoomNotFoundException("Room with id '" + id + "' not found."));
+    }
     public List<Room> findAllRooms() {
-        return this.roomRepository.findAll();
+        return roomRepository.findAll();
     }
 
-    public Room saveRoom(Room room) { return this.roomRepository.save(room); }
+    public Room saveRoom(Room room) { return roomRepository.save(room); }
 
     public List<Room> saveRooms(List<Room> rooms) {
-        return this.roomRepository.saveAll(rooms);
+        return roomRepository.saveAll(rooms);
+    }
+
+    public void deleteRoom(String id) {
+        roomRepository.deleteById(id);
     }
 }

@@ -30,10 +30,11 @@ export class RoomService extends BaseService {
   }
 
   addNewRoom(room: Room): void {
-    this.roomsSubject.value?.push(room);
+    const currentRooms = this.roomsSubject.value || [];
+    this.roomsSubject.next([...currentRooms, room]);
   }
 
   addRooms(rooms: Room[]): void {
-    this.roomsSubject.next(rooms);
+    this.roomsSubject.next(rooms || []);
   }
 }

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GenericDialogQuestionComponent } from './generic-dialog-question.component';
+import { GenericDialogQuestionComponent } from './dialog-question.component';
 
 describe('GenericDialogQuestionComponent', () => {
   let component: GenericDialogQuestionComponent;

@@ -17,10 +17,11 @@ import { CTFMainComponent } from './components/ctf/ctf-main/ctf-main.component';
 import { RegisterComponent } from './components/register/register.component';
 import { UserComponent } from './components/user/user.component';
 import { CommonDialogComponent } from './components/common/common-dialog/common-dialog.component';
-import { GenericDialogQuestionComponent } from './components/common/generic-dialog-question/generic-dialog-question.component';
-import { GenericAddObjectDialogFormComponent } from './components/common/generic-add-object-dialog-form/generic-add-object-dialog-form.component';
 import { SkeletonDirective } from './directives/skeleton.directive';
 import { SkeletonRectComponent } from './components/common/skeleton-rect/skeleton-rect.component';
+import { AddDialogFormComponent } from './components/common/add-dialog-form/add-dialog-form.component';
+import { DialogQuestionComponent } from './components/common/dialog-question/dialog-question.component';
+import { DragnDropDirective } from './directives/dragndrop.directive';
 
 export function init_app(environmentService: EnvironmentService) {
   return () => environmentService.load().then(() => {
@@ -40,10 +41,11 @@ export function init_app(environmentService: EnvironmentService) {
     RegisterComponent,
     UserComponent,
     CommonDialogComponent,
-    GenericDialogQuestionComponent,
-    GenericAddObjectDialogFormComponent,
+    DialogQuestionComponent,
+    AddDialogFormComponent,
     SkeletonDirective,
-    SkeletonRectComponent
+    SkeletonRectComponent,
+    DragnDropDirective
   ],
   imports: [
     BrowserModule,

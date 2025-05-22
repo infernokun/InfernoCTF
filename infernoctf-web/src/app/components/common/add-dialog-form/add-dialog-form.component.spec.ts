@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GenericAddObjectDialogFormComponent } from './generic-add-object-dialog-form.component';
+import {AddDialogFormComponent } from './add-dialog-form.component';
 
 describe('GenericAddObjectDialogFormComponent', () => {
-  let component: GenericAddObjectDialogFormComponent;
-  let fixture: ComponentFixture<GenericAddObjectDialogFormComponent>;
+  let component: AddDialogFormComponent;
+  let fixture: ComponentFixture<AddDialogFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [GenericAddObjectDialogFormComponent]
+      declarations: [AddDialogFormComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(GenericAddObjectDialogFormComponent);
+    fixture = TestBed.createComponent(AddDialogFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

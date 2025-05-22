@@ -1,8 +1,21 @@
+import { Observable } from "rxjs";
+
+export interface ObservableMap {
+  [key: string]: Observable<any>;
+}
+
+export interface FucntionMap {
+  [key: string]: Function;
+}
+
 export class SimpleFormData {
-  preFilledData?: Map<string, string>;
+  preFilledData?: Map<string, any>;
   questions: QuestionBase[];
   typeName: string;
   result: Map<string, string>;
+  action?: Observable<any>;
+  asyncData?: Observable<any>;
+  function?: Function;
   constructor(_typeName: string, _questions: QuestionBase[] = []) {
     this.typeName = _typeName;
     this.questions = _questions;
@@ -40,10 +53,17 @@ export class QuestionBase {
   order: number;
   controlType: string;
   type: string;
-  options: { key: string; value: string }[];
+  options: { key: string; value: string, disabled: boolean }[];
+  options2: { key: string; value: string }[];
   dependentQuestions: Map<string, QuestionBase> | undefined; //key is the show val
   size: number = 50;
   action?: Function;
+  neededEnum?: { key: string, value: string[] };
+  isHiddenByDefault?: boolean;
+  asyncData?: Observable<any>;
+  hint?: string;
+  dataBoolean?: boolean = false;
+  function?: Function;
 
   constructor(
     options: {
@@ -55,12 +75,20 @@ export class QuestionBase {
       order?: number;
       controlType?: string;
       type?: string;
-      options?: { key: string; value: string }[];
+      options?: { key: string; value: string, disabled: boolean }[];
+      options2?: { key: string; value: string }[];
       dependentQuestions?: Map<string, QuestionBase>;
       action?: Function;
-    } = {}
+      neededEnum?: { key: string, value: string[] };
+      asyncData?: Observable<any>;
+      hint?: string;
+      size?: number;
+      dataBoolean?: boolean;
+      function?: Function;
+
+    } = {}, isHiddenByDefault: boolean = false
   ) {
-    this.cb = options.cb ?? ((k: any, v: any) => {});
+    this.cb = options.cb ?? ((k: any, v: any) => { });
     this.dependentQuestions = options.dependentQuestions;
     this.value = options.value;
     this.key = options.key || '';
@@ -70,7 +98,15 @@ export class QuestionBase {
     this.controlType = options.controlType || '';
     this.type = options.type || '';
     this.options = options.options || [];
-    this.action = options.action ?? ((...argsv: any[]) => {});
+    this.options2 = options.options2 || [];
+    this.action = options.action ?? ((...argsv: any[]) => { });
+    this.neededEnum = options.neededEnum;
+    this.isHiddenByDefault = isHiddenByDefault;
+    this.asyncData = options.asyncData || undefined;
+    this.hint = options.hint || undefined;
+    this.size = options.size || this.size;
+    this.dataBoolean = options.dataBoolean || false;
+    this.function = options.function || undefined;
   }
 }
 
@@ -90,6 +126,10 @@ export class TextQuestion extends QuestionBase {
   override type: string = 'text';
 }
 
+export class PasswordQuestion extends QuestionBase {
+  override type: string = 'password';
+}
+
 export class TextAreaQuestion extends QuestionBase {
   override type: string = 'textarea';
   override size: number = 350;
@@ -97,4 +137,20 @@ export class TextAreaQuestion extends QuestionBase {
 
 export class DateQuestion extends QuestionBase {
   override type: string = 'date';
+}
+
+export class RadioQuestion extends QuestionBase {
+  override type: string = 'radio';
+}
+
+export class UploadBoxQuestion extends QuestionBase {
+  override type: string = 'uploadbox';
+}
+
+export class CheckBoxQuestion extends QuestionBase {
+  override type: string = 'checkbox';
+}
+
+export class ButtonQuestion extends QuestionBase {
+  override type: string = 'button';
 }

@@ -1,6 +1,10 @@
 package com.infernokun.infernoctf.models.entities;
 
-import com.infernokun.infernoctf.interfaces.JsonDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
@@ -21,9 +25,16 @@ public abstract class StoredObject {
     private String id;
     private String createdBy = "SYSTEM";
     private String updatedBy = "SYSTEM";
-    @JsonDate
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdAt = LocalDateTime.now();
-    @JsonDate
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+
     private LocalDateTime updatedAt = LocalDateTime.now();
     @Version
     private Integer versioning;

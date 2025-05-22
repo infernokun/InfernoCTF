@@ -2,6 +2,7 @@ package com.infernokun.infernoctf.services;
 
 import com.infernokun.infernoctf.exceptions.ResourceNotFoundException;
 import com.infernokun.infernoctf.models.entities.User;
+import com.infernokun.infernoctf.models.enums.Role;
 import com.infernokun.infernoctf.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,25 +23,32 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsernameIgnoreCase(username);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .authorities(user.getRole().name())
+                .build();
+    }
+
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
+
     public User findUserById(String userId) {
         if (userId == null) {
             throw new IllegalArgumentException("User ID cannot be null");
         }
         return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
-    }
-
-    public boolean existsByUsername(String username) {
-        return this.userRepository.existsByUsername(username);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("user is not valid"));
-    }
-
-    public User findUserByUsername(String username) throws UsernameNotFoundException {
-        return this.userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User is not valid"));
     }
 
     public boolean registerUser(User user) {
@@ -74,7 +82,7 @@ public class UserService implements UserDetailsService {
     public boolean authenticatedUser(String username, String password) {
         String encodedPassword = "";
 
-        return this.passwordEncoder.matches(password, encodedPassword);
+        return passwordEncoder.matches(password, encodedPassword);
     }
     public List<User> findAllUsers() {
         return this.userRepository.findAll();
@@ -87,6 +95,6 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean existsByUsernameOrEmail(User user) {
-        return this.userRepository.existsByUsername(user.getUsername()) || this.userRepository.existsByEmail(user.getEmail());
+        return userRepository.existsByUsername(user.getUsername()) || userRepository.existsByEmail(user.getEmail());
     }
 }

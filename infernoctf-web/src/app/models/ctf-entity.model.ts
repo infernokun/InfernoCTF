@@ -20,8 +20,9 @@ export class CTFEntity extends StoredObject {
     relatedChallenges?: string[];
 
     constructor(serverResult?: any) {
-        super(serverResult);
         if (serverResult) {
+            super(serverResult);
+
             this.question = serverResult.question;
             this.maxAttempts = serverResult.maxAttempts;
             this.description = serverResult.description;
@@ -33,8 +34,8 @@ export class CTFEntity extends StoredObject {
             this.flags = serverResult.flags;
             this.tags = serverResult.tags;
             this.visible = serverResult.visible;
-            this.releaseDate = serverResult.releaseDate;
-            this.expirationDate =serverResult.expirationDate;
+            this.releaseDate = serverResult.releaseDate ? new Date(serverResult.releaseDate) : undefined;
+            this.expirationDate = serverResult.expirationDate ? new Date(serverResult.expirationDate) : undefined;
             this.attachments = serverResult.solutionExplanation;
             this.relatedChallenges = serverResult.relatedChallenges;
         }

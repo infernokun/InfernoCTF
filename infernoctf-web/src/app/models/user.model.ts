@@ -6,14 +6,16 @@ export class User extends StoredObject {
   email?: string;
   password?: string;
   role?: Role;
-  editMode = false;
+  editMode?: boolean
 
   constructor(serverResult?: any) {
-    super(serverResult);
-
     if (serverResult) {
+      super(serverResult);
       this.username = serverResult.username;
-      this.role = serverResult.role as Role;
+      this.email = serverResult.email;
+      this.password = serverResult.password;
+      this.role = serverResult.role;
+      this.editMode = false;
     }
   }
 }

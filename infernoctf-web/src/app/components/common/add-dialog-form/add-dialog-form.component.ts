@@ -7,29 +7,28 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { GenericDialogQuestionComponent } from '../generic-dialog-question/generic-dialog-question.component';
+import { DialogQuestionComponent } from '../dialog-question/dialog-question.component';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SimpleFormData } from '../../../models/SimpleFormData.model';
 import { MessageService } from '../../../services/message.service';
 
 @Component({
-  selector: 'app-generic-add-object-dialog-form',
-  templateUrl: './generic-add-object-dialog-form.component.html',
-  styleUrls: ['./generic-add-object-dialog-form.component.scss'],
+  selector: 'app-add-dialog-form',
+  templateUrl: './add-dialog-form.component.html',
+  styleUrls: ['./add-dialog-form.component.scss'],
   standalone: false
 })
-export class GenericAddObjectDialogFormComponent implements OnInit, AfterViewInit {
-  // @Input() d!: SimpleFormData;
-  // @Input() labelAddOn: string = "";
-  // @Output() result = new EventEmitter<SimpleFormData>();
-
-  @ViewChildren(GenericDialogQuestionComponent) questionComponents: QueryList<GenericDialogQuestionComponent> | undefined;
+export class AddDialogFormComponent implements OnInit, AfterViewInit {
+  @ViewChildren(DialogQuestionComponent) questionComponents: QueryList<DialogQuestionComponent> | undefined;
 
   dynamicForm: FormGroup | undefined;
 
+  isLoading = true;
+  isSubmitting = false;
+
   constructor(
-    public dialogRef: MatDialogRef<GenericAddObjectDialogFormComponent>,
+    public dialogRef: MatDialogRef<AddDialogFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: SimpleFormData,
     private fb: FormBuilder,
     private messageService: MessageService
@@ -52,23 +51,29 @@ export class GenericAddObjectDialogFormComponent implements OnInit, AfterViewIni
 
   ngAfterViewInit() {
     this.questionComponents?.forEach(
-      (questionComponent: GenericDialogQuestionComponent) => {
+      (questionComponent: DialogQuestionComponent) => {
         this.dynamicForm?.addControl(
           questionComponent.question.key,
           questionComponent.formControl
         );
       }
     );
+
+    this.isLoading = false;
   }
 
-  // updateResult(k: string, e: any) {
-  //   console.log(e);
-  //   this.question.cb(k, e.target.value);
-  // }
+  get hasQuestions(): boolean {
+    return this.data?.questions?.length > 0;
+  }
+
+  get canSubmit(): boolean {
+    return this.dynamicForm?.valid! && !this.isSubmitting;
+  }
 
   onSubmit() {
     if (this.dynamicForm!.valid) {
       this.dialogRef.close(this.data);
+      this.isSubmitting = true;
     } else {
       const invalidControls: string[] = [];
 
@@ -83,6 +88,7 @@ export class GenericAddObjectDialogFormComponent implements OnInit, AfterViewIni
         const invalidControlsMessage = `The following values are not valid: ${invalidControls.join(', ')}`;
         this.messageService.snackbar(invalidControlsMessage);
       }
+      this.isSubmitting = false;
     }
   }
 
@@ -102,9 +108,15 @@ export class GenericAddObjectDialogFormComponent implements OnInit, AfterViewIni
   }
 
   formatTitle(title: string): string {
-    if (title == 'subIndicator') {
-      return 'Sub-Indicator';
-    }
     return title.charAt(0).toUpperCase() + title.substring(1, title.length);
+  }
+
+
+  formatCamelCase(text: string): string {
+    if (!text) return '';
+
+    const spaced = text.replace(/([A-Z])/g, ' $1');
+
+    return spaced.charAt(0).toUpperCase() + spaced.slice(1).trim();
   }
 }
