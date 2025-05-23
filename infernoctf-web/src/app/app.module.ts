@@ -7,7 +7,7 @@ import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { CTFCardComponent } from './components/ctf/ctf-card/ctf-card.component';
 import { EnvironmentService } from './services/environment.service';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from './material.module';
 import { EditDialogComponent } from './components/common/edit-dialog/edit-dialog.component';
@@ -22,6 +22,7 @@ import { SkeletonRectComponent } from './components/common/skeleton-rect/skeleto
 import { AddDialogFormComponent } from './components/common/add-dialog-form/add-dialog-form.component';
 import { DialogQuestionComponent } from './components/common/dialog-question/dialog-question.component';
 import { DragnDropDirective } from './directives/dragndrop.directive';
+import { AuthInterceptor } from './services/auth/auth-interceptor.service';
 
 export function init_app(environmentService: EnvironmentService) {
   return () => environmentService.load().then(() => {
@@ -61,7 +62,12 @@ export function init_app(environmentService: EnvironmentService) {
         const initializerFn = (init_app)(inject(EnvironmentService));
         return initializerFn();
       }),
-    provideHttpClient(withInterceptorsFromDi())
+    provideHttpClient(withInterceptorsFromDi()),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

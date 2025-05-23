@@ -82,9 +82,16 @@ public class CTFEntityService {
     /**
      * Retrieves all CTF entities
      */
+    @Transactional(readOnly = true)
     public List<CTFEntity> findAllCTFEntities() {
         log.info("Fetching all CTF entities");
         return ctfEntityRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CTFEntity> findAllWithFlags() {
+        log.info("Fetching all CTF entities w/ flags");
+        return ctfEntityRepository.findAllWithFlags();
     }
 
     /**

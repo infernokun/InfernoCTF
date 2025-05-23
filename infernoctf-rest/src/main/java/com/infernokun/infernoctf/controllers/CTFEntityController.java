@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.infernokun.infernoctf.utils.ConstFunctions.buildSuccessResponse;
 
@@ -18,13 +19,32 @@ import static com.infernokun.infernoctf.utils.ConstFunctions.buildSuccessRespons
 @RequiredArgsConstructor
 @RequestMapping("/api/ctf-entity")
 public class CTFEntityController {
-
     private final CTFEntityService ctfEntityService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<CTFEntity>>> getAllCTFEntities() {
         log.debug("Fetching all CTF entities");
 
+        List<CTFEntity> entities = ctfEntityService.findAllCTFEntities();
+
+        return buildSuccessResponse(
+                "All entities retrieved successfully",
+                entities,
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("by")
+    public ResponseEntity<ApiResponse<List<CTFEntity>>> getCtfEntitiesBy(@RequestParam Map<String, String> params) {
+        if (params.containsKey("room")) {
+            List<CTFEntity> entities = ctfEntityService.findCTFEntitiesByRoomId((params.get("room")));
+
+            return buildSuccessResponse(
+                    "All entities retrieved successfully by room: " + params.get("room"),
+                    entities,
+                    HttpStatus.OK
+            );
+        }
         List<CTFEntity> entities = ctfEntityService.findAllCTFEntities();
 
         return buildSuccessResponse(

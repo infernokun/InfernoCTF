@@ -1,5 +1,6 @@
 package com.infernokun.infernoctf.controllers;
 
+import com.infernokun.infernoctf.models.ApiResponse;
 import com.infernokun.infernoctf.models.dto.FlagAnswer;
 import com.infernokun.infernoctf.models.entities.AnsweredCTFEntity;
 import com.infernokun.infernoctf.models.entities.User;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+import static com.infernokun.infernoctf.utils.ConstFunctions.buildSuccessResponse;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/answer")
@@ -33,7 +36,7 @@ public class FlagAnswerController {
     }
 
     @PostMapping()
-    public ResponseEntity<AnsweredCTFEntity> answerQuestion(@RequestBody FlagAnswer flagAnswer) {
+    public ResponseEntity<ApiResponse<AnsweredCTFEntity>> answerQuestion(@RequestBody FlagAnswer flagAnswer) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (flagAnswer == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -45,25 +48,17 @@ public class FlagAnswerController {
         }
         boolean isAnswerCorrect = this.flagService.validateFlag(flagAnswer);
 
-        Optional<AnsweredCTFEntity> answeredCTFEntityOptional = this.flagService
-                .addAnsweredCTFEntity(authentication.getName(), flagAnswer, isAnswerCorrect);
-
-        return answeredCTFEntityOptional.map(answeredCTFEntity ->
-                        ResponseEntity.status(HttpStatus.OK).body(answeredCTFEntity))
-                .orElse(ResponseEntity.notFound().build());
+        return buildSuccessResponse("Got some answer", flagService
+                .addAnsweredCTFEntity(authentication.getName(), flagAnswer, isAnswerCorrect), HttpStatus.OK);
     }
 
     @GetMapping("/check")
-    public ResponseEntity<AnsweredCTFEntity> checkChallengeStatus(@RequestParam String ctfEntityId) {
+    public ResponseEntity<ApiResponse<AnsweredCTFEntity>> checkChallengeStatus(@RequestParam String ctfEntityId) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        User user = this.userService.findUserByUsername(authentication.getName());
+        User user = this.userService.findUserById(authentication.getName());
 
-        Optional<AnsweredCTFEntity> answeredCTFEntityOptional = this.answeredCTFEntityService
-                .findByUserIdAndCtfEntityId(user.getId(), ctfEntityId);
-
-        return answeredCTFEntityOptional.map(answeredCTFEntity ->
-                        ResponseEntity.status(HttpStatus.OK).body(answeredCTFEntity))
-                .orElse(ResponseEntity.ok().build());
+        return buildSuccessResponse("Got some answer", answeredCTFEntityService
+                .findByUserIdAndCtfEntityId(user.getId(), ctfEntityId), HttpStatus.OK);
     }
 }

@@ -61,9 +61,11 @@ public class TokenService {
                         .findFirst()
                 .orElse(new User("admin", "defaultPassword"));
 
-        String scope = admin.getAuthorities().stream()
+        String scope = admin.getAuthorities() != null
+                ? admin.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
+                .collect(Collectors.joining(" ")) : "";
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(Instant.now())

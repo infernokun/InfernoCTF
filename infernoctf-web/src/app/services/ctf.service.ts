@@ -27,7 +27,7 @@ export class CTFService extends BaseService {
   }
 
   getChallengesByRoom(roomId: string): Observable<ApiResponse<CTFEntity[]>> {
-    return this.get<ApiResponse<CTFEntity[]>>(this.environmentService.settings?.restUrl + '/ctf-entity/room/' + roomId);
+    return this.get<ApiResponse<CTFEntity[]>>(this.environmentService.settings?.restUrl + '/ctf-entity/by?room=' + roomId);
   }
 
   answerChallenge(flag: FlagAnswer): Observable<ApiResponse<any>> {

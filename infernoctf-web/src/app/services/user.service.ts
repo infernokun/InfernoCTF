@@ -33,7 +33,7 @@ export class UserService extends BaseService {
   }
 
   getUserById(id: string): Observable<User | undefined> {
-    return this.get<ApiResponse<User>>(this.environmentService.settings?.restUrl + '/user/' + id)
+    return this.get<ApiResponse<User>>(this.environmentService.settings?.restUrl + '/user/by?id=' + id)
       .pipe(
         map((response: ApiResponse<User>) => new User(response.data))
       );

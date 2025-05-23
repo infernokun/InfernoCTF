@@ -1,5 +1,6 @@
 package com.infernokun.infernoctf.services;
 
+import com.infernokun.infernoctf.exceptions.ResourceNotFoundException;
 import com.infernokun.infernoctf.models.entities.AnsweredCTFEntity;
 import com.infernokun.infernoctf.models.entities.CTFEntity;
 import com.infernokun.infernoctf.models.dto.FlagAnswer;
@@ -39,21 +40,20 @@ public class FlagService {
                 .anyMatch(flag -> flag.equals(flagAnswer.getFlag()));
     }
 
-    public Optional<AnsweredCTFEntity> addAnsweredCTFEntity(String username, FlagAnswer flagAnswer, boolean correct) {
+    public AnsweredCTFEntity addAnsweredCTFEntity(String username, FlagAnswer flagAnswer, boolean correct) {
         User user = this.userService.findUserByUsername(username);
-        CTFEntity ctfEntity =  this.ctfEntityService.findCTFEntityById(flagAnswer.getQuestionId());
+        CTFEntity ctfEntity = this.ctfEntityService.findCTFEntityById(flagAnswer.getQuestionId());
 
-        Optional<AnsweredCTFEntity> answeredCTFEntityOptional = answeredCTFEntityService
-                .findByUserIdAndCtfEntityId(user.getId(), ctfEntity.getId());
-
-        AnsweredCTFEntity answeredCTFEntity = answeredCTFEntityOptional.orElseGet(
-                () -> AnsweredCTFEntity
+        AnsweredCTFEntity answeredCTFEntity = answeredCTFEntityService
+                .findByUserIdAndCtfEntityIdOptional(user.getId(), ctfEntity.getId())
+                .orElseGet(() -> AnsweredCTFEntity
                         .builder()
                         .user(user)
                         .ctfEntity(ctfEntity)
                         .correct(correct)
                         .answers(new ArrayList<>())
                         .times(new ArrayList<>())
+                        .attempts(0)
                         .build());
 
         answeredCTFEntity.getAnswers().add(flagAnswer.getFlag());
@@ -61,6 +61,10 @@ public class FlagService {
         answeredCTFEntity.setAttempts(answeredCTFEntity.getAttempts() + 1);
         answeredCTFEntity.setCorrect(correct);
 
-        return this.answeredCTFEntityService.saveAnsweredCTFEntity(answeredCTFEntity);
+        return answeredCTFEntityService.saveAnsweredCTFEntity(answeredCTFEntity);
+    }
+
+    public List<Flag> getFlagsByCtfEntityId(String ctfEntityId) {
+        return flagRepository.getFlagsByCtfEntityId(ctfEntityId);
     }
 }

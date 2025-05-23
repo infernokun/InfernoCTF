@@ -6,6 +6,7 @@ import { User } from '../models/user.model';
 import { LoginResponseDTO } from '../models/dto/login-response.dto.model';
 import { ApiResponse } from '../models/api-response.model';
 import { UserService } from './user.service';
+import { HttpErrorResponse } from '@angular/common/module.d-CnjH8Dlt';
 
 export interface UserPayload {
   user: User;
@@ -29,43 +30,50 @@ export class AuthService {
 
   isAuthenticated(): Observable<boolean> {
     const token = localStorage.getItem('jwt');
-
     if (!token) {
-      // No token found, return false immediately
       console.log('token not found!!!');
       return of(false);
     }
-
+    
     console.log('token found!!!');
-
     const decodedToken = this.decodeToken(token);
+    
     if (!decodedToken || !decodedToken.exp || decodedToken.exp * 1000 <= Date.now()) {
-      // Token expired, attempt revalidation
       console.log('Token found and expired, revalidating...');
       return this.revalidateToken(token).pipe(
-        catchError(() => of(false)) // If revalidation fails, return false
+        catchError(() => {
+          this.clearToken(); // Clear invalid token
+          return of(false);
+        })
       );
     }
-
+    
     console.log('Token found and active', decodedToken.sub);
-
-    // Fetch user details from the server
+    
     return this.userService.getUserById(decodedToken.sub).pipe(
       switchMap((user: User | undefined) => {
         if (!user) {
           return of(false);
         }
-
         const payload: UserPayload = {
           user: user,
           token: token
         };
-
-        // Check if token is still valid from the server
         return this.checkTokenValidity(token, payload);
       }),
-      catchError(() => of(false)) // Catch any errors and return false
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          console.log('Token invalid on server, clearing...');
+          this.clearToken(); // Clear invalid token
+        }
+        return of(false);
+      })
     );
+  }
+  
+  private clearToken(): void {
+    localStorage.removeItem('jwt');
+    // Also clear any other auth-related data
   }
 
   setPayload(user: User, jwt: string): void {

@@ -4,8 +4,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CTFService } from '../../../services/ctf.service';
 import { FlagAnswer } from '../../../models/flag-answer.model';
 import { AuthService, UserPayload } from '../../../services/auth.service';
-import { BehaviorSubject, Observable, take } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, take, throwError } from 'rxjs';
 import { ApiResponse } from '../../../models/api-response.model';
+import { HttpErrorResponse } from '@angular/common/module.d-CnjH8Dlt';
 
 @Component({
   selector: 'app-view-dialog',
@@ -31,21 +32,33 @@ export class ViewDialogComponent {
   ngOnInit(): void {
     console.log("opened dialog");
 
-    this.ctfService.answerChallengeCheck(this.viewedChallenge).subscribe((response: ApiResponse<any>) => {
+    this.ctfService.answerChallengeCheck(this.viewedChallenge).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 404) {
+          // Return a default response or empty observable
+          return error.error as ApiResponse<any> ? of(error.error) : of({ data: null });
+        }
+        // Re-throw other errors
+        return throwError(() => error);
+      })
+    ).subscribe((response: ApiResponse<any>) => {
+      console.log('check answer response', response);
+      
       if (response.data) {
         console.log('is answered', response);
         if (response.data.correct === true) {
           this.isAnswered.next(true);
-
           const ans: any[] = response.data.answers;
           this.answer = ans[ans.length - 1];
           return;
         }
-
         if (response.data.attempts == this.viewedChallenge.maxAttempts) {
           this.isAnswered.next(true);
           return;
         }
+      } else {
+        // Handle the 404 case - challenge not answered yet
+        this.isAnswered.next(false);
       }
     });
   }

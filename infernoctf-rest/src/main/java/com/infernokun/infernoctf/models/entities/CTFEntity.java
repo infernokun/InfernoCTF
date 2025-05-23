@@ -1,6 +1,7 @@
 package com.infernokun.infernoctf.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -29,6 +30,7 @@ public class CTFEntity extends StoredObject {
     private List<String> hints;
     @OneToMany(mappedBy = "ctfEntity", cascade = CascadeType.ALL)
     @JsonManagedReference
+    @JsonIgnore
     private List<Flag> flags;
     private String category;
     private String difficultyLevel;
