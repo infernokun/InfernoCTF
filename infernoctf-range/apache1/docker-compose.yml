@@ -1,4 +1,3 @@
-version: '3'
 services:
   vulnerable_web:
     image: infernoctf/apache1

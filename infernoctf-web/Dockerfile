@@ -1,13 +1,15 @@
-# syntax=docker/dockerfile:1.4.2
+# syntax=docker/dockerfile:1
 # Stage 1: Compile
 FROM node:lts-bullseye AS compile-stage
 
 WORKDIR /app/
 
 # Install pnpm globally
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10
 
-COPY --link *.json pnpm-lock.yaml /app/
+# pnpm-workspace.yaml carries the allowBuilds list. Without it pnpm 10 skips the
+# Angular toolchain's install scripts and `ng build` then refuses to run.
+COPY --link *.json pnpm-lock.yaml pnpm-workspace.yaml /app/
 COPY --link src/ /app/src/
 
 RUN --mount=type=cache,target=/root/.npm/_cacache \
@@ -41,7 +43,9 @@ COPY --chmod=755 ./scripts/docker-entrypoint.sh /docker-entrypoint.sh
 VOLUME [ "/etc/nginx" ]
 
 EXPOSE 80
-HEALTHCHECK --start-period=5s CMD curl --fail http://localhost/ || exit 1
+# /health, not /: the SPA shell is served on every probe otherwise, and nginx.conf
+# already exposes a few-byte /health for exactly this.
+HEALTHCHECK --start-period=5s CMD curl --fail http://localhost/health || exit 1
 
 USER nginx
 

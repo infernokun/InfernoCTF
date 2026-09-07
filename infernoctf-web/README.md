@@ -1,27 +1,56 @@
-# InfernoctfWeb
+# infernoctf-web
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.8.
+Angular 22 frontend for [InfernoCTF](../README.md). Built with the Angular CLI and served
+from nginx in production.
 
-## Development server
+## Development
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+```bash
+pnpm install
+pnpm start          # dev server on http://localhost:4301
+```
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+`pnpm start` binds `0.0.0.0`, so the dev server is reachable from other hosts on the
+network as well as from `localhost`.
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```bash
+pnpm build          # production build (the default configuration) into dist/app
+pnpm watch          # development build, rebuilding on change
+```
 
-## Running unit tests
+## Tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+pnpm test           # Karma + Jasmine
+```
 
-## Running end-to-end tests
+Karma needs a Chrome/Chromium binary; point `CHROME_BIN` at one if it is not on `PATH`.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Docker
 
-## Further help
+```bash
+pnpm docker:build   # build the compile + runtime stages and push to Docker Hub
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+The runtime image is `nginx:alpine` with the bundle in `/usr/share/nginx/html`, the config
+from [`nginx/nginx.conf`](nginx/nginx.conf), and a `/health` endpoint the container
+healthcheck probes. `/api/` is reverse-proxied to the `infernoctf-rest` service.
+
+## Runtime configuration
+
+The app does not bake API URLs into the bundle. It loads
+[`src/assets/environment/app.config.json`](src/assets/environment/app.config.json) at
+startup; in a container [`scripts/docker-entrypoint.sh`](scripts/docker-entrypoint.sh)
+generates that file from `app.config.production.json` with `envsubst`, so `BASE_URL` and
+`REST_URL` come from the environment.
+
+## Toolchain notes
+
+- Angular 22 / TypeScript 6.0, building through `@angular/build` (the `@angular-devkit/build-angular`
+  package it replaced is no longer used).
+- pnpm 10 requires dependency install scripts to be allow-listed; the Angular toolchain's
+  native packages are declared in [`pnpm-workspace.yaml`](pnpm-workspace.yaml).
+- The app is still NgModule-based (`standalone: false` components) and bootstraps through
+  `platformBrowserDynamic`.

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject, takeUntil, switchMap, filter, tap, catchError, of, EMPTY } from 'rxjs';
+import { Observable, Subject, takeUntil, switchMap, filter, tap, catchError, of, EMPTY } from 'rxjs';
 import { CTFService } from '../../../services/ctf.service';
 import { CTFEntity } from '../../../models/ctf-entity.model';
 import { DialogService } from '../../../services/dialog.service';
@@ -20,7 +20,7 @@ export class CTFCardComponent implements OnInit, OnDestroy {
   public error: string | null = null;
   
   // Use service loading state directly
-  loading$ = this.ctfService.loading$;
+  loading$: Observable<boolean>;
   
   // Subject for handling component destruction
   private destroy$ = new Subject<void>();
@@ -31,7 +31,9 @@ export class CTFCardComponent implements OnInit, OnDestroy {
     private webSocketService: WebsocketService,
     private authService: AuthService,
     private route: ActivatedRoute
-  ) {}
+  ) {
+    this.loading$ = this.ctfService.loading$;
+  }
 
   ngOnInit(): void {
     this.initializeComponent();

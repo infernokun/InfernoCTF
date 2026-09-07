@@ -2,8 +2,9 @@ import groovy.json.JsonSlurper
 
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.2'
+	id 'org.springframework.boot' version '3.5.14'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.github.ben-manes.versions' version '0.54.0'
 }
 
 group = 'com.infernokun.infernoctf'
@@ -27,23 +28,19 @@ test {
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(
+			(System.getenv('JAVA_TOOLCHAIN_VERSION') ?: '25').toInteger()
+		)
 	}
 }
 
-ext {
-	set('springCloudVersion', "2024.0.0")
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+// Named once, for every Boot task - bootJar used to set this and bootRun did not.
+springBoot {
+	mainClass = 'com.infernokun.infernoctf.InfernoCtfApplication'
 }
 
 bootJar {
 	archiveFileName = 'infernoctf-rest.jar'
-	mainClass.set('com.infernokun.infernoctf.InfernoCtfApplication')
 }
 
 configurations {
@@ -56,9 +53,11 @@ repositories {
 	mavenCentral()
 }
 
-repositories {
-	mavenCentral()
-}
+// ── Security version overrides on top of the Spring Boot 3.5.14 BOM ───────────
+ext['tomcat.version'] = '10.1.55'
+ext['netty.version'] = '4.1.135.Final'
+ext['jackson-bom.version'] = '2.21.4'
+ext['postgresql.version'] = '42.7.11'
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -75,8 +74,10 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 // ─── Inject version into application.yml ──────────────────────────────────────

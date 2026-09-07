@@ -6,7 +6,7 @@ import { User } from '../models/user.model';
 import { LoginResponseDTO } from '../models/dto/login-response.dto.model';
 import { ApiResponse } from '../models/api-response.model';
 import { UserService } from './user.service';
-import { HttpErrorResponse } from '@angular/common/module.d-CnjH8Dlt';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface UserPayload {
   user: User;

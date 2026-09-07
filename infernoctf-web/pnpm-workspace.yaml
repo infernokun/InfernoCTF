@@ -1,0 +1,8 @@
+# pnpm 10 refuses to run a dependency's install scripts unless it is listed here, and
+# `ng build` fails the deps check while any are outstanding. These four are the Angular
+# 22 toolchain's own native/binary packages.
+allowBuilds:
+  "@parcel/watcher": true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true

@@ -2,19 +2,20 @@ import { Injectable } from '@angular/core';
 import { EnvironmentService } from './environment.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
-  private readonly loginUrl: string = `${this.environmentService.settings?.restUrl}/auth/login`;
-  private readonly tokenUrl: string = `${this.environmentService.settings?.restUrl}/auth/token`;
+  private readonly loginUrl: string;
+  private readonly tokenUrl: string;
 
   constructor(
     private environmentService: EnvironmentService,
-    private httpClient: HttpClient,
-    private router: Router) {}
+    private httpClient: HttpClient) {
+    this.loginUrl = `${this.environmentService.settings?.restUrl}/auth/login`;
+    this.tokenUrl = `${this.environmentService.settings?.restUrl}/auth/token`;
+  }
 
   public login(username: string, password: string): Observable<any> {
     const credentials = { username: username, password: password };

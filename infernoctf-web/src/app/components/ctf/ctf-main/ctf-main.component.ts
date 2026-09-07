@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -10,9 +11,11 @@ import { AuthService } from '../../../services/auth.service';
 export class CTFMainComponent {
   authenticated: boolean = false;
 
-  constructor(private authService: AuthService) { }
+  loading$: Observable<boolean>;
 
-  loading$ = this.authService.loading$;
+  constructor(private authService: AuthService) {
+    this.loading$ = this.authService.loading$;
+  }
 
   ngOnInit(): void {
     /*this.authService.isAuthenticated().subscribe((authenticated) => {

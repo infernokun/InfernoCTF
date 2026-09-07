@@ -6,7 +6,7 @@ import { FlagAnswer } from '../../../models/flag-answer.model';
 import { AuthService, UserPayload } from '../../../services/auth.service';
 import { BehaviorSubject, catchError, Observable, of, take, throwError } from 'rxjs';
 import { ApiResponse } from '../../../models/api-response.model';
-import { HttpErrorResponse } from '@angular/common/module.d-CnjH8Dlt';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-view-dialog',

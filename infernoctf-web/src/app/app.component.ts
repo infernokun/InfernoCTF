@@ -26,7 +26,7 @@ export class AppComponent {
   appVersion: any;
   bannerDisplayStyle: string = 'green-white';
 
-  loading$ = this.authService.loading$;
+  loading$: Observable<boolean>;
 
   private unsubscribe$ = new Subject<void>();
 
@@ -34,6 +34,7 @@ export class AppComponent {
     private authService: AuthService,
     private dialogService: DialogService
   ) {
+    this.loading$ = this.authService.loading$;
     this.appVersion = appVersion;
     /*this.authService.loggedInUsername$.subscribe((username) => {
       this.username = username;

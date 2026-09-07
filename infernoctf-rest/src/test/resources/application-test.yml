@@ -1,0 +1,30 @@
+# Profile used by the test suite. application.yml pins `spring.profiles.active: local`,
+# which points at a real PostgreSQL; @ActiveProfiles("test") on the test classes swaps
+# that for the in-memory database below so the suite runs with no external services.
+spring:
+  datasource:
+    url: jdbc:h2:mem:infernoctf;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+
+# application.yml has `/${URL_PREFIX}` here, and URL_PREFIX is only set in a deployed
+# container - override it so the placeholder never has to resolve under test.
+server:
+  servlet:
+    contextPath: /infernoctf-rest
+
+infernoctf:
+  applicationName: InfernoCTF
+  defaultAdminUsername: infernoctf_admin
+  defaultAdminPassword: password
+  chatService: ""
+  chatSocket: ""
+
+logging:
+  level:
+    org.hibernate: WARN

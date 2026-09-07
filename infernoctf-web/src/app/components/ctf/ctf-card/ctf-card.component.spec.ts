@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CtfCardComponent } from './ctf-card.component';
+import { CTFCardComponent } from './ctf-card.component';
 
-describe('CtfCardComponent', () => {
-  let component: CtfCardComponent;
-  let fixture: ComponentFixture<CtfCardComponent>;
+describe('CTFCardComponent', () => {
+  let component: CTFCardComponent;
+  let fixture: ComponentFixture<CTFCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CtfCardComponent]
+      declarations: [CTFCardComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(CtfCardComponent);
+    fixture = TestBed.createComponent(CTFCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

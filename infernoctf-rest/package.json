@@ -19,7 +19,7 @@
     "author": "InfernoKun",
     "email": "infernokun@infernokun.com",
     "devDependencies": {
-      "nodemon": "^2.0.16"
+      "nodemon": "^3.1.14"
     },
     "dependencies": {}
   }

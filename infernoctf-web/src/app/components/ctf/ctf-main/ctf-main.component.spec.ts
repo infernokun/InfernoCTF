@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CtfMainComponent } from './ctf-main.component';
+import { CTFMainComponent } from './ctf-main.component';
 
-describe('CtfMainComponent', () => {
-  let component: CtfMainComponent;
-  let fixture: ComponentFixture<CtfMainComponent>;
+describe('CTFMainComponent', () => {
+  let component: CTFMainComponent;
+  let fixture: ComponentFixture<CTFMainComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CtfMainComponent]
+      declarations: [CTFMainComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(CtfMainComponent);
+    fixture = TestBed.createComponent(CTFMainComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
