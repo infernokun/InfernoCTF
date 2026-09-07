@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { User } from '../models/user.model';
 import { ApiResponse } from '../models/api-response.model';
 import { EnvironmentService } from './environment.service';
@@ -10,9 +10,11 @@ import { BaseService } from './base.service';
   providedIn: 'root'
 })
 export class UserService extends BaseService {
-  private usersSubject = new BehaviorSubject<User[]>([]);
-  private loggedInUserSubject = new BehaviorSubject<User | undefined>(undefined);
-  loggedInUser$: Observable<User | undefined> = this.loggedInUserSubject.asObservable();
+  private readonly usersState = signal<User[]>([]);
+  private readonly loggedInUserState = signal<User | undefined>(undefined);
+
+  readonly users = this.usersState.asReadonly();
+  readonly loggedInUser = this.loggedInUserState.asReadonly();
 
   constructor(
     protected httpClient: HttpClient,
@@ -20,16 +22,8 @@ export class UserService extends BaseService {
     super(httpClient);
   }
 
-  get users$(): Observable<User[]> {
-    return this.usersSubject.asObservable();
-  }
-
-  getLoggedInUser(): Observable<User | undefined> {
-    return this.loggedInUser$;
-  }
-
   setLoggedInUser(user: User): void {
-    this.loggedInUserSubject.next(user);
+    this.loggedInUserState.set(user);
   }
 
   getUserById(id: string): Observable<User | undefined> {
@@ -42,9 +36,7 @@ export class UserService extends BaseService {
   getAllUsers(): Observable<User[]> {
     return this.get<ApiResponse<User[]>>(this.environmentService.settings?.restUrl + '/user').pipe(
       map((response: ApiResponse<User[]>) => response.data.map((user) => new User(user))),
-      tap((users) => {
-        this.usersSubject.next(users);
-      })
+      tap((users) => this.usersState.set(users))
     );
   }
 }

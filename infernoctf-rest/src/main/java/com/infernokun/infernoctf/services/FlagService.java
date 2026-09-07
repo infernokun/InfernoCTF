@@ -40,8 +40,8 @@ public class FlagService {
                 .anyMatch(flag -> flag.equals(flagAnswer.getFlag()));
     }
 
-    public AnsweredCTFEntity addAnsweredCTFEntity(String username, FlagAnswer flagAnswer, boolean correct) {
-        User user = this.userService.findUserByUsername(username);
+    /** Takes a resolved {@link User}, not a username: the caller has the id from the token. */
+    public AnsweredCTFEntity addAnsweredCTFEntity(User user, FlagAnswer flagAnswer, boolean correct) {
         CTFEntity ctfEntity = this.ctfEntityService.findCTFEntityById(flagAnswer.getQuestionId());
 
         AnsweredCTFEntity answeredCTFEntity = answeredCTFEntityService

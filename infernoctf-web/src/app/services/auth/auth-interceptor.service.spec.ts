@@ -1,16 +1,19 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { AuthInterceptor } from './auth-interceptor.service';
 
-describe('AuthInterceptorService', () => {
-  let service: AuthInterceptor;
+describe('AuthInterceptor', () => {
+  let interceptor: AuthInterceptor;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(AuthInterceptor);
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), AuthInterceptor],
+    });
+    interceptor = TestBed.inject(AuthInterceptor);
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(interceptor).toBeTruthy();
   });
 });

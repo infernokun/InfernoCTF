@@ -8,8 +8,7 @@ COPY --link gradlew /app/gradlew
 COPY --link gradle /app/gradle
 COPY --link build.gradle /app/build.gradle
 COPY --link settings.gradle /app/settings.gradle
-# build.gradle reads the project version out of this; without it every image was
-# stamped 0.0.1-SNAPSHOT regardless of what package.json said.
+# build.gradle reads the project version out of this.
 COPY --link package.json /app/package.json
 COPY --link src /app/src
 RUN chmod +x gradlew
@@ -25,8 +24,7 @@ LABEL maintainer="infernokun@infernokun.com" \
 
 VOLUME ["/data/certs"]
 
-# `apk upgrade` pulls base-image OS fixes the image scan flags - the Temurin base
-# tag lags the Alpine security branch.
+# The Temurin base tag lags the Alpine security branch.
 RUN apk upgrade --no-cache && apk add --no-cache tini curl bash
 
 RUN set -eux; \
@@ -35,20 +33,16 @@ RUN set -eux; \
     mkdir -p /app; \
     chown java:java -R /app /home/java
 
-# NOTE: PROJECT is deliberately still undeclared at this point, so ${PROJECT} here
-# expands to the empty string and the context path comes out as "/" - which is what
-# this image has always shipped. Declaring ARG PROJECT above this line would silently
-# change the served base path to /infernoctf-rest. Left as-is on purpose.
+# PROJECT is deliberately undeclared here, so ${PROJECT} expands to empty and the context
+# path is "/". Declaring ARG PROJECT above this line would change the served base path.
 ENV JAVA_TOOL_OPTIONS='-Dserver.servlet.contextPath=/${PROJECT} \
                         -XX:-TieredCompilation'
 
 ARG PROJECT
 ENV PROJECT=${PROJECT}
 
-# Copy entrypoint and JAR.
-# --chown must be NUMERIC here: `--link` builds each layer independently of the base
-# image, so there is no /etc/passwd to resolve the name `java` against and BuildKit
-# fails with "invalid user index: -1". 1000:1000 is the java user created above.
+# --chown must be numeric: `--link` builds the layer without the base image, so there is no
+# /etc/passwd to resolve `java` against. 1000:1000 is the java user created above.
 COPY --link --chown=1000:1000 scripts/docker-entrypoint.sh /
 COPY --link --chown=1000:1000 --from=compile-stage /app/build/libs/${PROJECT}.jar /app/${PROJECT}.jar
 COPY --link --chown=1000:1000 --from=compile-stage /app/package.json /app/package.json

@@ -44,8 +44,9 @@ server:
 
 infernoctf:
   applicationName: InfernoCTF
-  defaultAdminUsername: infernoctf_admin
-  defaultAdminPassword: password
+  defaultAdminUsername: ${DEFAULT_ADMIN_USERNAME:infernoctf_admin}
+  # Empty on purpose: unset means a random password is generated and logged once.
+  defaultAdminPassword: ${DEFAULT_ADMIN_PASSWORD:}
   chatService: ""
   chatSocket: ""
 
@@ -53,3 +54,26 @@ logging:
   level:
     org.hibernate: WARN
     org.hibernate.orm.connections.pooling: ERROR
+
+app:
+  jwt:
+    # Must be persistent: a new key on every boot invalidates every issued token, and two
+    # instances with different keys cannot verify each other's.
+    key-dir: ${JWT_KEY_DIR:/data/certs/jwt}
+    access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:PT15M}
+    refresh-token-ttl: ${JWT_REFRESH_TOKEN_TTL:P14D}
+    refresh-cookie:
+      # Lax suits a same-origin SPA; another origin needs None, and therefore Secure.
+      name: ${JWT_REFRESH_COOKIE_NAME:refreshToken}
+      path: ${JWT_REFRESH_COOKIE_PATH:/}
+      same-site: ${JWT_REFRESH_COOKIE_SAME_SITE:Lax}
+      secure: ${JWT_REFRESH_COOKIE_SECURE:true}
+  cors:
+    # Only matters for a separately hosted frontend and for `ng serve`; the bundled nginx
+    # serves the SPA same-origin.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4301,http://localhost:4200}
+  login:
+    # Server-side throttling of password guessing, per window.
+    max-attempts-per-account: ${LOGIN_MAX_ATTEMPTS_PER_ACCOUNT:5}
+    max-attempts-per-source: ${LOGIN_MAX_ATTEMPTS_PER_SOURCE:20}
+    window: ${LOGIN_ATTEMPT_WINDOW:PT15M}

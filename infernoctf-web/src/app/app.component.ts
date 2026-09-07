@@ -1,8 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService, UserPayload } from './services/auth.service';
 import { DialogService } from './services/dialog.service';
 import { LoginComponent } from './components/login/login.component';
-import { map, Observable, of, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { LoginService } from './services/login.service';
 import { User } from './models/user.model';
 
@@ -20,21 +20,20 @@ export class AppComponent {
   header: string = 'UNCLASSIFIED';
   footer: string = 'UNCLASSIFIED';
 
-  loadingUser$: Observable<boolean> = of(false);
-  loggedInUser$: Observable<User | undefined> | undefined;
+  // inject(), not constructor parameters: the field initializers below read these, and
+  // parameter properties are not assigned yet at that point.
+  private readonly authService = inject(AuthService);
+  private readonly dialogService = inject(DialogService);
+
+  readonly loggedInUser = this.authService.user;
+  readonly loadingUser = this.authService.loading;
   
   appVersion: any;
   bannerDisplayStyle: string = 'green-white';
 
-  loading$: Observable<boolean>;
-
   private unsubscribe$ = new Subject<void>();
 
-  constructor(
-    private authService: AuthService,
-    private dialogService: DialogService
-  ) {
-    this.loading$ = this.authService.loading$;
+  constructor() {
     this.appVersion = appVersion;
     /*this.authService.loggedInUsername$.subscribe((username) => {
       this.username = username;
@@ -42,9 +41,6 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
-    this.loggedInUser$ = this.authService.user$;
-    this.loadingUser$ = this.authService.loading$;
-
     this.checkAuthentication();
   }
 

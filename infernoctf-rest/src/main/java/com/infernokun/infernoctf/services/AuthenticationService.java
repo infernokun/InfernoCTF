@@ -2,9 +2,8 @@ package com.infernokun.infernoctf.services;
 
 import com.infernokun.infernoctf.exceptions.AuthFailedException;
 import com.infernokun.infernoctf.exceptions.WrongPasswordException;
+import com.infernokun.infernoctf.models.dto.AuthSession;
 import com.infernokun.infernoctf.models.dto.RegistrationDTO;
-import com.infernokun.infernoctf.models.entities.RefreshToken;
-import com.infernokun.infernoctf.models.dto.LoginResponseDTO;
 import com.infernokun.infernoctf.models.entities.User;
 import com.infernokun.infernoctf.models.enums.Role;
 import com.infernokun.infernoctf.repositories.UserRepository;
@@ -12,14 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -30,28 +27,32 @@ public class AuthenticationService {
     private final TokenService tokenService;
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
+    private final LoginAttemptService loginAttemptService;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, TokenService tokenService, RefreshTokenService refreshTokenService, UserService userService) {
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                                 AuthenticationManager authenticationManager, TokenService tokenService,
+                                 RefreshTokenService refreshTokenService, UserService userService,
+                                 LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.refreshTokenService = refreshTokenService;
         this.userService = userService;
+        this.loginAttemptService = loginAttemptService;
     }
 
-    public boolean registerUser(RegistrationDTO user) {
-        if (user == null || user.getUsername() == null || user.getPassword() == null) {
+    public boolean registerUser(RegistrationDTO registration) {
+        if (registration == null || registration.getUsername() == null || registration.getPassword() == null) {
             throw new AuthFailedException("Username and password required!");
         }
 
-        if (userService.existsByUsername(user.getUsername())) {
+        if (userService.existsByUsername(registration.getUsername())) {
             throw new AuthFailedException("Username already exists!");
         }
 
-        String encodedPassword = this.passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        User newUser = new User(user.getUsername(), user.getPassword());
+        User newUser = new User(registration.getUsername(),
+                this.passwordEncoder.encode(registration.getPassword()));
         newUser.setRole(Role.MEMBER);
 
         userRepository.save(newUser);
@@ -60,39 +61,48 @@ public class AuthenticationService {
         return true;
     }
 
-    public LoginResponseDTO loginUser(String username, String password) {
+    @Transactional
+    public AuthSession loginUser(String username, String password, String sourceAddress) {
+        // Before touching the password, so a blocked caller cannot keep probing.
+        loginAttemptService.checkNotBlocked(username, sourceAddress);
         try {
-            Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
             User loggedInUser = userService.findUserByUsername(username);
             loggedInUser.setLastLogin(LocalDateTime.now());
             userService.updateUser(loggedInUser);
+            loginAttemptService.recordSuccess(username, sourceAddress);
 
-            String token = tokenService.generateJwt(loggedInUser);
-
-            return new LoginResponseDTO(token, loggedInUser);
+            return new AuthSession(
+                    tokenService.generateJwt(loggedInUser),
+                    refreshTokenService.issue(loggedInUser),
+                    loggedInUser);
         } catch (BadCredentialsException e) {
+            loginAttemptService.recordFailure(username, sourceAddress);
             throw new WrongPasswordException("Invalid username or password");
         } catch (AuthenticationException e) {
+            loginAttemptService.recordFailure(username, sourceAddress);
             throw new AuthFailedException("Authentication failed");
         }
     }
 
-    public LoginResponseDTO revalidateToken(String oldToken) {
-        log.info("old token: {}", oldToken);
-        RefreshToken oldRefreshToken = this.refreshTokenService.findByToken(oldToken);
-        log.info("OLD REFRESH TOKEN - Found!");
-        if (Objects.equals(oldRefreshToken.getToken(), oldToken)) {
-            log.info("OLD REFRESH TOKEN - Matches database for user {}!", oldRefreshToken.getUser().getId());
-            Optional<User> user = this.userRepository.findById(oldRefreshToken.getUser().getId());
-            if (user.isPresent()) {
-                log.info("OLD REFRESH TOKEN - Token replaced!");
-                String token = this.tokenService.generateJwt(user.get());
-                return new LoginResponseDTO(token, user.get());
-            }
-        }
-        return null;
+    /**
+     * Exchanges a refresh grant for a new access token and a new grant. Validation, expiry and
+     * single-use rotation live in {@link RefreshTokenService#rotate}, which throws on failure.
+     */
+    @Transactional
+    public AuthSession refresh(String refreshToken) {
+        User user = refreshTokenService.rotate(refreshToken);
+        log.debug("Refreshed session for user {}", user.getId());
+        return new AuthSession(
+                tokenService.generateJwt(user),
+                refreshTokenService.issue(user),
+                user);
+    }
+
+    /** The user id comes from the token, never from the client. */
+    @Transactional
+    public void logout(String userId) {
+        refreshTokenService.revokeByUserId(userId);
     }
 }

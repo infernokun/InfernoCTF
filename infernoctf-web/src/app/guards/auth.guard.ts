@@ -1,9 +1,24 @@
 import { inject } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
+import { map } from 'rxjs';
 
-export const authGuard: CanActivateFn = (
-  route: ActivatedRouteSnapshot, 
-  state: RouterStateSnapshot) => {
-    const router = inject(Router);
-  return localStorage.getItem('jwt') ? true : router.navigate(['/']);
+import { AuthService } from '../services/auth.service';
+
+/** Allows navigation only for a session the API accepts, refreshing the token if expired. */
+export const authGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  return inject(AuthService).ensureAuthenticated().pipe(
+    map(authenticated => authenticated || router.createUrlTree(['/'])),
+  );
+};
+
+/** Routing convenience only; the API enforces the same rule independently. */
+export const adminGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  const authService = inject(AuthService);
+
+  return authService.ensureAuthenticated().pipe(
+    map(authenticated =>
+      (authenticated && authService.isAdmin()) || router.createUrlTree(['/'])),
+  );
 };

@@ -31,7 +31,7 @@ it needs no PostgreSQL and no other running service. Test classes opt in with
 
 ## Versioning
 
-The project version comes from [`package.json`](package.json) — Gradle reads it at
+The project version comes from [`package.json`](package.json): Gradle reads it at
 configuration time and `injectVersionIntoProperties` writes it into `application.yml` as
 `app.version` during `processResources`. Bump the version there, not in `build.gradle`.
 
@@ -51,6 +51,24 @@ pnpm docker:build   # or npm run docker:build
 Two stages: `gradle:jdk25-corretto` to compile, `eclipse-temurin:25-jre-alpine` to run,
 with tini as PID 1 and the app running as uid 1000. `PROJECT` is a build arg naming the
 jar (`infernoctf-rest`).
+
+## Authentication
+
+Short-lived RS256 access tokens plus opaque, single-use refresh grants. See
+[Authentication](../README.md#authentication) in the root README for the endpoint contract and
+the role rules.
+
+Two things are easy to get wrong when running this:
+
+- **`JWT_KEY_DIR` must point at persistent storage.** The key pair is generated there on first
+  start. If the directory is not writable the service still starts, but logs a warning and
+  keeps the key in memory: which means every restart invalidates all issued tokens and a
+  second instance cannot verify the first one's.
+- **`DEFAULT_ADMIN_PASSWORD`**: unset means a random bootstrap password is generated and
+  logged once at WARN. There is no hardcoded default any more.
+
+`AuthenticationSecurityTest` covers the rules themselves: anonymous rejection, role
+enforcement, refresh rotation and logout revocation: against in-memory H2.
 
 ## Configuration
 

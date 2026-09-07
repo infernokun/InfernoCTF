@@ -1,39 +1,35 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { User } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
-import { AuthService } from '../../services/auth.service';
 import { Role } from '../../models/enums/role.enum';
-import { of } from 'rxjs';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UserComponent {
-  public users: User[] = [];
-  public busy = false;
+export class UserComponent implements OnInit {
+  private readonly userService = inject(UserService);
 
-  loading$ = of(false);
+  /** The service owns the list; this is the same signal, not a copy. */
+  readonly users = this.userService.users;
+  readonly busy = signal(false);
 
-  roles = Object.values(Role);
+  readonly roles = Object.values(Role);
 
-  constructor(
-    private userService: UserService,
-    private authService: AuthService
-  ) {
-    this.busy = true;
-    this.authService.loading$.subscribe((loading: any) => {
-      if (!loading) {
-        this.userService.users$.subscribe((users: User[]) => {
-          if (users) {
-            this.users = users;
-            this.busy = false;
-            //this.userService.loadingSubject.next(false);
-            console.log('users', users);
-          }
-        });
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.busy.set(true);
+    this.userService.getAllUsers().subscribe({
+      complete: () => this.busy.set(false),
+      error: (error) => {
+        console.error('Failed to load users:', error);
+        this.busy.set(false);
       }
     });
   }

@@ -1,11 +1,11 @@
 <div class="ctf-page-container">
-  <div class="ctf-header" *ngIf="challenges.length > 0">
+  <div class="ctf-header" *ngIf="challenges().length > 0">
     <h1 class="section-title">CTF Challenges</h1>
-    <div class="challenge-count">{{ challenges.length }} Challenge{{ challenges.length !== 1 ? 's' : '' }} Available</div>
+    <div class="challenge-count">{{ challenges().length }} Challenge{{ challenges().length !== 1 ? 's' : '' }} Available</div>
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="loading$ | async" class="loading-container">
+  <div *ngIf="loading()" class="loading-container">
     <div class="loading-spinner">
       <mat-spinner diameter="50"></mat-spinner>
       <p class="loading-text">Loading challenges...</p>
@@ -13,11 +13,11 @@
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error && !(loading$ | async)" class="error-container">
+  <div *ngIf="error() && !loading()" class="error-container">
     <div class="error-card">
       <i class="error-icon">⚠️</i>
       <h3>Something went wrong</h3>
-      <p>{{ error }}</p>
+      <p>{{ error() }}</p>
       <button class="retry-btn" (click)="retry()">
         <i class="retry-icon">🔄</i>
         Try Again
@@ -26,7 +26,7 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!error && !(loading$ | async) && challenges.length === 0" class="empty-container">
+  <div *ngIf="!error() && !loading() && challenges().length === 0" class="empty-container">
     <div class="empty-card">
       <i class="empty-icon">🎯</i>
       <h3>No Challenges Found</h3>
@@ -35,8 +35,8 @@
   </div>
 
   <!-- CTF Cards -->
-  <div class="ctf-card-container" *ngIf="!(loading$ | async) && !error && challenges.length > 0">
-    <div *ngFor="let ctf of challenges" class="ctf-card" [class.completed]="false">
+  <div class="ctf-card-container" *ngIf="!loading() && !error() && challenges().length > 0">
+    <div *ngFor="let ctf of challenges()" class="ctf-card" [class.completed]="false">
       
       <!-- Card Header -->
       <div class="card-header">

@@ -23,7 +23,7 @@
       <button mat-icon-button 
               class="refresh-btn"
               (click)="refreshRooms()"
-              [disabled]="isLoading$ | async"
+              [disabled]="isLoading()"
               matTooltip="Refresh rooms">
         <mat-icon>refresh</mat-icon>
       </button>
@@ -31,14 +31,14 @@
       <button mat-raised-button 
               class="create-btn" 
               (click)="createRoom()"
-              [disabled]="isLoading$ | async">
+              [disabled]="isLoading()">
         <mat-icon>add</mat-icon>
         Create Room
       </button>
     </div>
   </div>
 
-  <ng-container *ngIf="filteredRooms$ | async as rooms">
+  <ng-container *ngIf="filteredRooms() as rooms">
     <div *ngIf="rooms.length > 0; else noRoomsTemplate" class="room-grid">
       <a *ngFor="let room of rooms; trackBy: trackByRoomId" 
          [routerLink]="['/room', room.id]" 
@@ -89,7 +89,7 @@
         <button mat-raised-button 
                 class="create-btn" 
                 (click)="createRoom()"
-                [disabled]="isLoading$ | async">
+                [disabled]="isLoading()">
           <mat-icon>add</mat-icon>
           {{ searchControl.value ? 'Create New Room' : 'Get Started' }}
         </button>
@@ -97,7 +97,7 @@
     </ng-template>
   </ng-container>
 
-  <div *ngIf="isLoading$ | async" class="loading-overlay">
+  <div *ngIf="isLoading()" class="loading-overlay">
     <div class="loading-content">
       <mat-spinner diameter="40"></mat-spinner>
       <p>Loading rooms...</p>

@@ -79,11 +79,6 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public boolean authenticatedUser(String username, String password) {
-        String encodedPassword = "";
-
-        return passwordEncoder.matches(password, encodedPassword);
-    }
     public List<User> findAllUsers() {
         return this.userRepository.findAll();
     }

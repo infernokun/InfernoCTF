@@ -4,79 +4,89 @@ import com.infernokun.infernoctf.exceptions.TokenException;
 import com.infernokun.infernoctf.models.entities.RefreshToken;
 import com.infernokun.infernoctf.models.entities.User;
 import com.infernokun.infernoctf.repositories.RefreshTokenRepository;
-import com.infernokun.infernoctf.repositories.UserRepository;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
+import java.util.Base64;
+import java.util.HexFormat;
 
+/**
+ * Issues and redeems refresh tokens: 256 bits of {@link SecureRandom}, stored only as a SHA-256
+ * hash. Single-use, so a captured token stops working once the real client uses it.
+ *
+ * <p>One grant per user, so one active session per account: logging in elsewhere invalidates
+ * the earlier session.
+ */
 @Service
 public class RefreshTokenService {
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final int TOKEN_BYTES = 32;
+
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserRepository userRepository;
+    private final Duration tokenTtl;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository,
+                               @Value("${app.jwt.refresh-token-ttl:P14D}") Duration tokenTtl) {
         this.refreshTokenRepository = refreshTokenRepository;
-        this.userRepository = userRepository;
+        this.tokenTtl = tokenTtl;
     }
 
-    public void createRefreshToken(String username, String token, Instant expiration) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    /** Returns the raw token, which is not recoverable afterwards. */
+    @Transactional
+    public String issue(User user) {
+        byte[] raw = new byte[TOKEN_BYTES];
+        RANDOM.nextBytes(raw);
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(raw);
+        Instant now = Instant.now();
 
-        // Find existing token
-        Optional<RefreshToken> existingTokenOpt = this.refreshTokenRepository.findByUserId(user.getId());
+        RefreshToken grant = refreshTokenRepository.findByUserId(user.getId())
+                .orElseGet(() -> RefreshToken.builder().user(user).build());
+        grant.setTokenHash(hash(token));
+        grant.setCreationDate(now);
+        grant.setExpirationDate(now.plus(tokenTtl));
+        refreshTokenRepository.save(grant);
 
-        if (existingTokenOpt.isPresent()) {
-            RefreshToken existingToken = existingTokenOpt.get();
-
-            existingToken.setToken(token);
-            existingToken.setCreationDate(Instant.now());
-            existingToken.setExpirationDate(expiration);
-            refreshTokenRepository.save(existingToken);
-        } else {
-            // If no existing token, create a new one
-            RefreshToken newToken = RefreshToken.builder()
-                    .user(user)
-                    .token(token)
-                    .creationDate(Instant.now())
-                    .expirationDate(expiration)
-                    .build();
-
-            refreshTokenRepository.save(newToken);
-        }
-    }
-
-    public Optional<RefreshToken> findByUserId(String id) {
-        // Bypass cache for User lookups to avoid serialization issues
-        return this.refreshTokenRepository.findByUserId(id);
-    }
-
-    public RefreshToken findByToken(String token) {
-        // Bypass cache to avoid serialization issues
-        return this.refreshTokenRepository.findByToken(token).orElseThrow(
-                () -> new TokenException("Failed to find token."));
-    }
-
-    public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpirationDate().compareTo(Instant.now()) < 0) {
-            // Token expired - remove from DB and cache
-            this.refreshTokenRepository.delete(token);
-
-            throw new RuntimeException(token.getToken() + " Refresh token is expired. Please make a new login..!");
-        }
         return token;
     }
 
+    /** Validates the presented token and consumes it, deleting expired grants on the way. */
     @Transactional
-    public Optional<RefreshToken> deleteToken(String id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return refreshTokenRepository.deleteByUserId(id);
-        } else {
-            return Optional.empty();
+    public User rotate(String presentedToken) {
+        if (presentedToken == null || presentedToken.isBlank()) {
+            throw new TokenException("Refresh token is required.");
+        }
+
+        RefreshToken grant = refreshTokenRepository.findByTokenHash(hash(presentedToken))
+                .orElseThrow(() -> new TokenException("Refresh token is not valid."));
+
+        if (grant.getExpirationDate() == null || grant.getExpirationDate().isBefore(Instant.now())) {
+            refreshTokenRepository.delete(grant);
+            throw new TokenException("Refresh token has expired. Please log in again.");
+        }
+
+        User user = grant.getUser();
+        refreshTokenRepository.delete(grant);
+        return user;
+    }
+
+    @Transactional
+    public void revokeByUserId(String userId) {
+        refreshTokenRepository.deleteByUserId(userId);
+    }
+
+    private static String hash(String token) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return HexFormat.of().formatHex(digest.digest(token.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IllegalStateException("SHA-256 is unavailable", ex);
         }
     }
 }

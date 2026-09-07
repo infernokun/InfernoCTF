@@ -46,6 +46,30 @@ startup; in a container [`scripts/docker-entrypoint.sh`](scripts/docker-entrypoi
 generates that file from `app.config.production.json` with `envsubst`, so `BASE_URL` and
 `REST_URL` come from the environment.
 
+## Authentication
+
+The API issues a short-lived access token plus a single-use refresh grant. Only the **access
+token** is kept in `localStorage`, read through `TokenStorageService` (the one place that knows
+the storage key and how to decode a JWT). The refresh grant is an **httpOnly cookie** the
+browser attaches by itself: script cannot read it, so an XSS that drains `localStorage` gets a
+token that expires in minutes rather than a renewable session.
+
+`AuthInterceptor` attaches the access token to every request and, on a `401`, refreshes once
+and replays the original request. `AuthService.refreshSession()` shares a single in-flight
+refresh, which matters because grants are single-use on the server: firing several refreshes
+at once would invalidate each other and sign the user out.
+
+Route guards (`authGuard`, `adminGuard`) resolve the session through `AuthService` rather than
+just checking that a key exists in `localStorage`. They are a routing convenience only; the
+API enforces the same rules independently.
+
+The WebSocket connects only while signed in: `WebsocketService` watches `AuthService.payload$`,
+fetches a single-use handshake ticket per connection attempt (they expire in ~30s, so every
+retry needs a fresh one) and tears the socket down on logout.
+
+The remaining exposure is the access token in `localStorage`, a 15-minute window. Holding it
+in memory instead would close that, at the cost of a refresh round-trip on every page load.
+
 ## Toolchain notes
 
 - Angular 22 / TypeScript 6.0, building through `@angular/build` (the `@angular-devkit/build-angular`

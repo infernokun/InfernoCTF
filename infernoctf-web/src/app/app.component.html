@@ -31,7 +31,7 @@
     </nav>
     <div class="display-flex flex-row width-100-percent justify-content-end">
       <article class="user-info">
-        <div *ngIf="(loggedInUser$ | async) as user; else login" class="user-details">
+        <div *ngIf="loggedInUser() as user; else login" class="user-details">
           <span class="user-name">{{ user?.username }}</span>
           <span class="role-name">[{{ user?.role }}]</span>
         </div>
@@ -40,7 +40,7 @@
         <mat-icon>menu</mat-icon>
       </button>
       <mat-menu #theMenu="matMenu" class="user-actions-menu">
-        <ng-container *ngIf="(loggedInUser$ | async) as user; else guestMenu">
+        <ng-container *ngIf="loggedInUser() as user; else guestMenu">
           <!-- Logged-in user menu items -->
           <div class="user-menu-header">
             <span class="user-menu-name">{{ user.username }}</span>
@@ -85,7 +85,7 @@
 </div>
 
 <ng-template #login>
-  <div *ngIf="!(loadingUser$ | async) else loading" style="display: flex;">
+  <div *ngIf="!loadingUser(); else loading" style="display: flex;">
     <button class="user-button" mat-button
       (click)="openLoginModal()">Login</button>
     <button class="user-button" mat-button

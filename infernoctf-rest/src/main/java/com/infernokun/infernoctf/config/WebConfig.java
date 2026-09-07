@@ -4,22 +4,11 @@ import com.infernokun.infernoctf.logger.InfernoCTFLogger;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+// Deliberately no @EnableWebMvc: it disables Boot's MVC auto-configuration. CORS lives in
+// SecurityConfig so it applies inside the security filter chain.
 @Configuration
-@EnableWebMvc
-public class WebConfig implements WebMvcConfigurer {
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOriginPatterns("*")  // Allow all origins
-                .allowedMethods("*")         // Allow all HTTP methods
-                .allowedHeaders("*")         // Allow all headers
-                .allowCredentials(false);    // Do not require credentials
-    }
+public class WebConfig {
 
     @Bean
     public FilterRegistrationBean<InfernoCTFLogger> loggingFilter() {

@@ -6,10 +6,10 @@
 
     <form>
         <div class="form-group">
-            <input matInput type="text" placeholder="Answer" [(ngModel)]="answer" name="answer" [disabled]="!!(isAnswered$ | async)">
+            <input matInput type="text" placeholder="Answer" [ngModel]="answer()" (ngModelChange)="answer.set($event)" name="answer" [disabled]="isAnswered()">
         </div>
         
-        <button mat-button type="submit" (click)="checkAnswer(viewedChallenge)" [disabled]="!!(isAnswered$ | async)" [textContent]="!!(isAnswered$ | async) ? 'Complete' : 'Submit'"></button>
+        <button mat-button type="submit" (click)="checkAnswer(viewedChallenge)" [disabled]="isAnswered()" [textContent]="isAnswered() ? 'Complete' : 'Submit'"></button>
         <button type="button" (click)="closeDialog()">Cancel</button>
     </form>
 </div>

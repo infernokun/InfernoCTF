@@ -8,15 +8,10 @@ import com.infernokun.infernoctf.services.AnsweredCTFEntityService;
 import com.infernokun.infernoctf.services.FlagService;
 import com.infernokun.infernoctf.services.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 import static com.infernokun.infernoctf.utils.ConstFunctions.buildSuccessResponse;
 
@@ -28,34 +23,34 @@ public class FlagAnswerController {
     private final AnsweredCTFEntityService answeredCTFEntityService;
     private final UserService userService;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(FlagAnswerController.class);
-    public FlagAnswerController(FlagService flagService, AnsweredCTFEntityService answeredCTFEntityService, UserService userService) {
+    public FlagAnswerController(FlagService flagService, AnsweredCTFEntityService answeredCTFEntityService,
+                                UserService userService) {
         this.flagService = flagService;
         this.answeredCTFEntityService = answeredCTFEntityService;
         this.userService = userService;
     }
 
+    /**
+     * The submitter comes from the token, never the request body. Note the JWT subject is the
+     * user ID, not the username, so {@code flagAnswer.getUsername()} is ignored.
+     */
     @PostMapping()
-    public ResponseEntity<ApiResponse<AnsweredCTFEntity>> answerQuestion(@RequestBody FlagAnswer flagAnswer) {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (flagAnswer == null) {
+    public ResponseEntity<ApiResponse<AnsweredCTFEntity>> answerQuestion(@RequestBody FlagAnswer flagAnswer,
+                                                                        Authentication authentication) {
+        if (flagAnswer == null || flagAnswer.getQuestionId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        if (!flagAnswer.getUsername().equals(authentication.getName())) {
-            // If usernames don't match, return unauthorized
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        User user = this.userService.findUserById(authentication.getName());
         boolean isAnswerCorrect = this.flagService.validateFlag(flagAnswer);
 
-        return buildSuccessResponse("Got some answer", flagService
-                .addAnsweredCTFEntity(authentication.getName(), flagAnswer, isAnswerCorrect), HttpStatus.OK);
+        return buildSuccessResponse("Got some answer",
+                flagService.addAnsweredCTFEntity(user, flagAnswer, isAnswerCorrect), HttpStatus.OK);
     }
 
     @GetMapping("/check")
-    public ResponseEntity<ApiResponse<AnsweredCTFEntity>> checkChallengeStatus(@RequestParam String ctfEntityId) {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+    public ResponseEntity<ApiResponse<AnsweredCTFEntity>> checkChallengeStatus(@RequestParam String ctfEntityId,
+                                                                              Authentication authentication) {
         User user = this.userService.findUserById(authentication.getName());
 
         return buildSuccessResponse("Got some answer", answeredCTFEntityService

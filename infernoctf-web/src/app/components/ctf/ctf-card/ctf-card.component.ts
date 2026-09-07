@@ -1,5 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, Subject, takeUntil, switchMap, filter, tap, catchError, of, EMPTY } from 'rxjs';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Subject, takeUntil, switchMap, filter, tap, catchError, of, EMPTY } from 'rxjs';
 import { CTFService } from '../../../services/ctf.service';
 import { CTFEntity } from '../../../models/ctf-entity.model';
 import { DialogService } from '../../../services/dialog.service';
@@ -12,28 +13,29 @@ import { ApiResponse } from '../../../models/api-response.model';
   selector: 'app-ctf-card',
   templateUrl: './ctf-card.component.html',
   styleUrl: './ctf-card.component.scss',
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CTFCardComponent implements OnInit, OnDestroy {
-  public challenges: CTFEntity[] = [];
-  public busy = false;
-  public error: string | null = null;
-  
-  // Use service loading state directly
-  loading$: Observable<boolean>;
-  
+  // inject() rather than constructor parameters: the fields below read these during field
+  // initialization, before parameter properties would be assigned.
+  private readonly ctfService = inject(CTFService);
+  private readonly dialogService = inject(DialogService);
+  private readonly webSocketService = inject(WebsocketService);
+  private readonly authService = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+
+  /** Built here because toObservable() needs an injection context; ngOnInit is not one. */
+  private readonly authLoading$ = toObservable(this.authService.loading);
+
+  readonly challenges = signal<CTFEntity[]>([]);
+  readonly busy = signal(false);
+  readonly error = signal<string | null>(null);
+
+  readonly loading = this.ctfService.loading;
+
   // Subject for handling component destruction
   private destroy$ = new Subject<void>();
-
-  constructor(
-    private ctfService: CTFService,
-    private dialogService: DialogService,
-    private webSocketService: WebsocketService,
-    private authService: AuthService,
-    private route: ActivatedRoute
-  ) {
-    this.loading$ = this.ctfService.loading$;
-  }
 
   ngOnInit(): void {
     this.initializeComponent();
@@ -46,11 +48,11 @@ export class CTFCardComponent implements OnInit, OnDestroy {
   }
 
   private initializeComponent(): void {
-    this.busy = true;
-    this.error = null;
+    this.busy.set(true);
+    this.error.set(null);
 
-    // Wait for auth to complete, then get room param and fetch challenges
-    this.authService.loading$
+    // RxJS here: this coordinates two async sources and cancels in-flight work on change.
+    this.authLoading$
       .pipe(
         filter(loading => !loading), // Wait until auth is not loading
         switchMap(() => this.route.params), // Switch to route params
@@ -61,14 +63,13 @@ export class CTFCardComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (challenges) => {
-          this.challenges = challenges;
-          this.busy = false;
-          console.log('CTF Entities loaded:', challenges);
+          this.challenges.set(challenges);
+          this.busy.set(false);
         },
         error: (error) => {
           console.error('Error loading challenges:', error);
-          this.error = 'Failed to load challenges. Please try again.';
-          this.busy = false;
+          this.error.set('Failed to load challenges. Please try again.');
+          this.busy.set(false);
         }
       });
   }
@@ -76,13 +77,13 @@ export class CTFCardComponent implements OnInit, OnDestroy {
   private loadChallenges(roomId: string) {
     return this.ctfService.getChallengesByRoom(roomId)
       .pipe(
-        tap(() => this.ctfService.loadingSubject.next(true)),
+        tap(() => this.ctfService.setLoading(true)),
         catchError(error => {
-          this.ctfService.loadingSubject.next(false);
+          this.ctfService.setLoading(false);
           throw error;
         }),
         filter((response: ApiResponse<CTFEntity[]>) => !!response?.data),
-        tap(() => this.ctfService.loadingSubject.next(false))
+        tap(() => this.ctfService.setLoading(false))
       )
       .pipe(
         // Extract data from response
@@ -93,7 +94,9 @@ export class CTFCardComponent implements OnInit, OnDestroy {
   }
 
   private subscribeToWebSocketMessages(): void {
-    this.webSocketService.getMessage()
+    // getSubject(), not the raw socket: it survives reconnects, filters heartbeats, and
+    // exists before a connection does.
+    this.webSocketService.getSubject()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (message) => {
@@ -159,18 +162,18 @@ export class CTFCardComponent implements OnInit, OnDestroy {
   public refreshChallenges(): void {
     const currentRoom = this.route.snapshot.params['room'];
     if (currentRoom) {
-      this.busy = true;
+      this.busy.set(true);
       this.loadChallenges(currentRoom)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (challenges) => {
-            this.challenges = challenges;
-            this.busy = false;
+            this.challenges.set(challenges);
+            this.busy.set(false);
           },
           error: (error) => {
             console.error('Error refreshing challenges:', error);
-            this.error = 'Failed to refresh challenges.';
-            this.busy = false;
+            this.error.set('Failed to refresh challenges.');
+            this.busy.set(false);
           }
         });
     }

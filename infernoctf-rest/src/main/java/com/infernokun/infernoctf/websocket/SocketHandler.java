@@ -20,6 +20,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 public class SocketHandler extends TextWebSocketHandler {
+    // Every connection is authenticated, but broadcasts still go to all of them; there is no
+    // per-user or per-room filtering yet.
     private final List<WebSocketSession> currentSessions = new CopyOnWriteArrayList<>();
     private final ObjectWriter writer;
 
@@ -30,7 +32,8 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         this.currentSessions.add(session);
-        log.info("WEBSOCKET Connection Established w ID: {}", session.getId());
+        log.info("WEBSOCKET Connection Established w ID: {} for user {}",
+                session.getId(), session.getAttributes().get(WebSocketAuthInterceptor.USER_ID_ATTRIBUTE));
     }
 
     @Override

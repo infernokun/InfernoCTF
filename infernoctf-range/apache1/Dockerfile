@@ -1,5 +1,5 @@
-# DELIBERATELY OUT OF DATE. This is a CTF target: ubuntu:18.04 and the pinned
-# apache2 2.4.29 below are the vulnerability. Do not "upgrade" this image.
+# DELIBERATELY OUT OF DATE: this is a CTF target. ubuntu:18.04 and the pinned apache2
+# below are the vulnerability. Do not upgrade.
 FROM ubuntu:18.04
 
 # Add the Ubuntu archive for older package versions

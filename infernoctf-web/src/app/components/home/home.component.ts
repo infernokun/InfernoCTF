@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, computed, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RoomService } from '../../services/room.service';
-import { BehaviorSubject, Observable, Subject, combineLatest, debounceTime, distinctUntilChanged, finalize, map, startWith, takeUntil } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, finalize, map, startWith, takeUntil } from 'rxjs';
 import { Room, RoomFormData } from '../../models/room.model';
 import { CommonEditDialogService } from '../../services/common-edit-dialog.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -11,31 +12,38 @@ import { FormControl } from '@angular/forms';
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  private readonly loadingSubject = new BehaviorSubject<boolean>(false);
-  
-  // Observables
-  rooms$: Observable<Room[] | undefined>;
-  filteredRooms$: Observable<Room[]> | undefined = undefined;
-  isLoading$ = this.loadingSubject.asObservable();
-  
+
+  readonly isLoading = signal(false);
+
   // Form controls
   searchControl = new FormControl('');
-  
-  // Component state
+
+  /** Debouncing is time-based, so the keystroke stream stays RxJS; toSignal takes it from there. */
+  private readonly searchTerm = toSignal(
+    this.searchControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      distinctUntilChanged(),
+      map(term => (term || '').toLowerCase().trim()),
+    ),
+    { initialValue: '' });
+
+  /** Recomputes only when the room list or the search term changes. */
+  readonly filteredRooms = computed(() =>
+    this.filterRooms(this.roomService.rooms(), this.searchTerm()));
+
   readonly trackByRoomId = (index: number, room: Room): string => room.id || index.toString();
 
   constructor(
     private roomService: RoomService,
     private commonEditDialogService: CommonEditDialogService,
     private snackBar: MatSnackBar
-  ) {
-    this.rooms$ = this.roomService.rooms$;
-    this.setupFilteredRooms();
-  }
+  ) { }
 
   ngOnInit(): void {
     this.loadRooms();
@@ -44,27 +52,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.loadingSubject.complete();
-  }
-
-  /**
-   * Setup filtered rooms observable with search functionality
-   */
-  private setupFilteredRooms(): void {
-    const search$ = this.searchControl.valueChanges.pipe(
-      startWith(''),
-      debounceTime(300),
-      distinctUntilChanged(),
-      map(term => (term || '').toLowerCase().trim())
-    );
-
-    this.filteredRooms$ = combineLatest([
-      this.rooms$,
-      search$
-    ]).pipe(
-      map(([rooms, searchTerm]) => this.filterRooms(rooms || [], searchTerm)),
-      takeUntil(this.destroy$)
-    );
   }
 
   /**
@@ -147,7 +134,7 @@ export class HomeComponent implements OnInit, OnDestroy {
    * Open room creation dialog
    */
   createRoom(): void {
-    if (this.loadingSubject.value) {
+    if (this.isLoading()) {
       this.showWarning('Please wait for the current operation to complete.');
       return;
     }
@@ -275,7 +262,7 @@ export class HomeComponent implements OnInit, OnDestroy {
    * Set loading state
    */
   private setLoading(loading: boolean): void {
-    this.loadingSubject.next(loading);
+    this.isLoading.set(loading);
   }
 
   /**

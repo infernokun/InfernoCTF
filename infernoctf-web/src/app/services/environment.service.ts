@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 export interface EnvironmentSettings {
   production: boolean;
@@ -9,6 +10,7 @@ export interface EnvironmentSettings {
   baseEndPoint: string;
   websocketUrl: string;
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -22,15 +24,19 @@ export class EnvironmentService {
     return this.configSettings;
   }
 
-  public load(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.http.get<EnvironmentSettings>(this.configUrl).subscribe((response: EnvironmentSettings) => {
-        this.configSettings = response;
-        console.log('getting env settings: ', this.configSettings);
-        resolve(true);
-      });
-    }).catch((err: any) => {
-      console.log('Error reading configuration file: ', err);
-    });
+  /**
+   * Loads the runtime config during app initialization. Rejects on failure rather than
+   * leaving the initializer pending: every service builds its URLs from this config, so
+   * there is nothing useful to do without it.
+   */
+  public async load(): Promise<EnvironmentSettings> {
+    try {
+      this.configSettings = await firstValueFrom(
+        this.http.get<EnvironmentSettings>(this.configUrl));
+      return this.configSettings;
+    } catch (err) {
+      console.error(`Could not load ${this.configUrl}; the app cannot start without it.`, err);
+      throw err;
+    }
   }
 }

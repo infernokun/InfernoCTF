@@ -10,6 +10,7 @@ import { User } from '../../models/user.model';
 import { AuthService } from '../../services/auth.service';
 import { LoginService } from '../../services/login.service';
 import { UserService } from '../../services/user.service';
+import { TokenStorageService } from '../../services/auth/token-storage.service';
 
 @Component({
   selector: 'app-login',
@@ -41,6 +42,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private dialogRef: MatDialogRef<LoginComponent>,
     private userService: UserService,
+    private tokenStorage: TokenStorageService,
     private fb: FormBuilder
   ) { }
 
@@ -96,8 +98,6 @@ export class LoginComponent implements OnInit {
           }
           
           try {
-            const tokenPayload = JSON.parse(atob(response.data.jwt.split('.')[1]));
-            
             // Reset error state
             this.wrongPassword = false;
             this.loginAttempts = 0;
@@ -109,19 +109,17 @@ export class LoginComponent implements OnInit {
               localStorage.removeItem('rememberedUser');
             }
             
-            // Store token
-            localStorage.setItem('jwt', response.data.jwt);
+            // The refresh grant arrived as an httpOnly cookie on this response.
+            this.tokenStorage.setAccessToken(response.data.jwt);
             
             if (!response.data.user) {
               this.handleLoginError('No user data received');
               return;
             }
             
-            // Set user data and navigate
             const user = new User(response.data.user);
-            console.log('logging in', response.data.user)
-            this.authService.setPayload(user, tokenPayload);
-            this.router.navigate(['/home']);
+            this.authService.setPayload(user, response.data.jwt);
+            this.router.navigate(['/']);
             this.dialogRef.close(true);
           } catch (e) {
             console.error('Failed to process JWT token', e);

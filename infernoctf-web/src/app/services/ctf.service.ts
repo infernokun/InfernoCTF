@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { EnvironmentService } from './environment.service';
 import { HttpClient } from '@angular/common/http';
 import { CTFEntity } from '../models/ctf-entity.model';
-import { BehaviorSubject, EMPTY, Observable, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { FlagAnswer } from '../models/flag-answer.model';
 import { AuthService } from './auth.service';
 import { BaseService } from './base.service';
@@ -12,8 +12,12 @@ import { ApiResponse } from '../models/api-response.model';
   providedIn: 'root'
 })
 export class CTFService extends BaseService {
-  public loadingSubject = new BehaviorSubject<boolean>(true);
-  loading$ = this.loadingSubject.asObservable();
+  private readonly loadingState = signal<boolean>(true);
+  readonly loading = this.loadingState.asReadonly();
+
+  setLoading(loading: boolean): void {
+    this.loadingState.set(loading);
+  }
 
   constructor(
     protected httpClient: HttpClient,

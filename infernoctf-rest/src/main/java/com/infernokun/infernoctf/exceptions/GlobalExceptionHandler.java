@@ -61,6 +61,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(TooManyAttemptsException.class)
+    public ResponseEntity<ApiResponse<Boolean>> handleTooManyAttemptsException(TooManyAttemptsException ex) {
+        ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
+                .code(HttpStatus.TOO_MANY_REQUESTS.value())
+                .message(ex.getMessage())
+                .data(false)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.TOO_MANY_REQUESTS);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<?>> handleRuntimeException(RuntimeException ex) {
         ApiResponse<?> response = ApiResponse.<String>builder()

@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResponseDTO {
+    /** No refresh token here on purpose: it travels in an httpOnly cookie. */
     private String jwt;
     private UserDTO user;
 

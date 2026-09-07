@@ -1,6 +1,5 @@
-# Profile used by the test suite. application.yml pins `spring.profiles.active: local`,
-# which points at a real PostgreSQL; @ActiveProfiles("test") on the test classes swaps
-# that for the in-memory database below so the suite runs with no external services.
+# Test profile: @ActiveProfiles("test") swaps the `local` profile's PostgreSQL for H2 so
+# the suite runs with no external services.
 spring:
   datasource:
     url: jdbc:h2:mem:infernoctf;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
@@ -12,19 +11,26 @@ spring:
       ddl-auto: create-drop
     open-in-view: false
 
-# application.yml has `/${URL_PREFIX}` here, and URL_PREFIX is only set in a deployed
-# container - override it so the placeholder never has to resolve under test.
+# URL_PREFIX is only set in a deployed container; override so it never has to resolve.
 server:
   servlet:
     contextPath: /infernoctf-rest
 
 infernoctf:
   applicationName: InfernoCTF
+  # A known bootstrap admin so the security tests can obtain an ADMIN token.
   defaultAdminUsername: infernoctf_admin
-  defaultAdminPassword: password
+  defaultAdminPassword: test-admin-password
   chatService: ""
   chatSocket: ""
 
 logging:
   level:
     org.hibernate: WARN
+
+app:
+  jwt:
+    # A temp dir, so the suite never writes into /data/certs.
+    key-dir: ${java.io.tmpdir}/infernoctf-test-keys
+  cors:
+    allowed-origins: http://localhost:4301

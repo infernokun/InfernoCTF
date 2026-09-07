@@ -1,5 +1,5 @@
-<div class="user-container" *ngIf="!(loading$ | async) else loading">
-  <div *ngFor="let user of users" class="user-row">
+<div class="user-container" *ngIf="!busy(); else loading">
+  <div *ngFor="let user of users()" class="user-row">
     <div class="user-info" *ngIf="!user.editMode">
       <h2>{{ user.username }}</h2>
       <p>{{ user.email }}</p>

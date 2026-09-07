@@ -34,7 +34,6 @@ java {
 	}
 }
 
-// Named once, for every Boot task - bootJar used to set this and bootRun did not.
 springBoot {
 	mainClass = 'com.infernokun.infernoctf.InfernoCtfApplication'
 }
@@ -65,11 +64,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.apache.httpcomponents:httpcore'
-	implementation 'org.apache.httpcomponents.client5:httpclient5'
-	// https://mvnrepository.com/artifact/org.bitbucket.b_c/jose4j
-	implementation 'org.bitbucket.b_c:jose4j:0.9.6'
-	implementation 'ch.qos.logback:logback-classic'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

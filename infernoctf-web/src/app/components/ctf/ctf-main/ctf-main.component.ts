@@ -1,25 +1,16 @@
-import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-ctf-main',
   templateUrl: './ctf-main.component.html',
   styleUrl: './ctf-main.component.scss',
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CTFMainComponent {
-  authenticated: boolean = false;
+  // inject() so the field initializer below can read it.
+  private readonly authService = inject(AuthService);
 
-  loading$: Observable<boolean>;
-
-  constructor(private authService: AuthService) {
-    this.loading$ = this.authService.loading$;
-  }
-
-  ngOnInit(): void {
-    /*this.authService.isAuthenticated().subscribe((authenticated) => {
-      this.authenticated = authenticated;
-    });*/
-  }
+  readonly loading = this.authService.loading;
 }
